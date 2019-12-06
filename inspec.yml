@@ -1,0 +1,10 @@
+name: aws_rds_instance
+title: AWS RDS instance
+maintainer: FXinnovation, Inc.
+copyright: FXinnovaion, Inc.
+copyright_email: cloudsquad@fxinnovation.com
+license: MIT
+summary: Inspec profile that validate a AWS RDS instance
+version: 0.1.0
+supports:
+  - platform: aws
