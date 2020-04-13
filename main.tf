@@ -360,17 +360,17 @@ resource "aws_db_option_group" "this" {
   major_engine_version     = var.option_group_major_engine_version
 
   dynamic "option" {
-    for_each = var.option_group_options
+    for_each = var.option_group_option_names
 
     content {
-      option_name                    = option.value.option_name
-      port                           = lookup(option.value, "port", null)
-      version                        = lookup(option.value, "version", null)
-      db_security_group_memberships  = lookup(option.value, "db_security_group_memberships", null)
-      vpc_security_group_memberships = lookup(option.value, "vpc_security_group_memberships", null)
+      option_name                    = element(concat(var.option_group_option_names, [null]), option.key)
+      port                           = element(concat(var.option_group_option_ports, [null]), option.key)
+      version                        = element(concat(var.option_group_option_versions, [null]), option.key)
+      db_security_group_memberships  = element(concat(var.option_group_option_db_security_group_memberships, [null]), option.key)
+      vpc_security_group_memberships = element(concat(var.option_group_option_vpc_security_group_memberships, [null]), option.key)
 
       dynamic "option_settings" {
-        for_each = option.value.option_settings
+        for_each = var.option_group_option_settings[option.key]
 
         content {
           name  = option_settings.value.name

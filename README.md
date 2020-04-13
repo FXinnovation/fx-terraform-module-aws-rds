@@ -87,7 +87,16 @@ Terraform module that helps you create a RDS instance.
 | option\_group\_engine\_name | Specifies the name of the engine that this option group should be associated with. | `string` | `null` | no |
 | option\_group\_major\_engine\_version | Specifies the major version of the engine that this option group should be associated with. | `string` | `null` | no |
 | option\_group\_name | The name of the option group. | `string` | `null` | no |
+<<<<<<< HEAD
 | option\_group\_options | A list of map of Options to apply. Map must support the following structure:<br>  * option\_name (required, string): The Name of the Option (e.g. MEMCACHED).<br>  * port (optional, number): The Port number when connecting to the Option (e.g. 11211).<br>  * version (optional, string): The version of the option (e.g. 13.1.0.0).<br>  * db\_security\_group\_memberships (optional, string): A list of DB Security Groups for which the option is enabled.<br>  * vpc\_security\_group\_memberships (optional, string): A list of VPC Security Groups for which the option is enabled.<br>  * option\_settings (required, list of map): A list of map of option settings to apply:<br>    * name (required, string): The Name of the setting.<br>    * value (required, string): The Value of the setting.<br><br>For example, see folder examples/db\_instance\_with\_option\_group. | `any` | `[]` | no |
+=======
+| option\_group\_option\_db\_security\_group\_memberships | List of list of DB Security Groups for which the option is enabled. | `list(list(string))` | <pre>[<br>  []<br>]</pre> | no |
+| option\_group\_option\_names | List of option name, e.g. MEMCACHED | `list(string)` | `[]` | no |
+| option\_group\_option\_ports | List of port use when connecting to the option | `list(number)` | `[]` | no |
+| option\_group\_option\_settings | list of list of maps of option settings | <pre>list(list(object({<br>    name  = string,<br>    value = string,<br>  })))</pre> | <pre>[<br>  []<br>]</pre> | no |
+| option\_group\_option\_versions | List of option version e.g 1.3.1.0.0 | `list(string)` | `[]` | no |
+| option\_group\_option\_vpc\_security\_group\_memberships | List of list of VPC Security Groups for which the option is enabled. | `list(list(string))` | <pre>[<br>  []<br>]</pre> | no |
+>>>>>>> 48c2392... feature/ add db_instance and aws_db_option_group
 | option\_group\_tags | Tags to be merge with the DB option group resource. | `map(string)` | `{}` | no |
 | parameter\_group\_family | The family of the DB parameter group | `string` | `null` | no |
 | parameter\_group\_name | The name of the DB parameter group. | `string` | `null` | no |

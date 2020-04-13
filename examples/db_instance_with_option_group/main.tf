@@ -114,5 +114,4 @@ module "db_instance_with_option_group" {
       ]
     }
   ]
-
 }

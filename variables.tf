@@ -547,6 +547,7 @@ variable "option_group_major_engine_version" {
   default     = null
 }
 
+<<<<<<< HEAD
 variable "option_group_options" {
   description = <<-DOCUMENTATION
 A list of map of Options to apply. Map must support the following structure:
@@ -563,6 +564,46 @@ For example, see folder examples/db_instance_with_option_group.
 DOCUMENTATION
   type        = any
   default     = []
+}
+
+=======
+variable "option_group_option_names" {
+  description = "List of option name, e.g. MEMCACHED"
+  type        = list(string)
+  default     = []
+}
+
+variable "option_group_option_ports" {
+  description = "List of port use when connecting to the option"
+  type        = list(number)
+  default     = []
+}
+
+variable "option_group_option_versions" {
+  description = "List of option version e.g 1.3.1.0.0"
+  type        = list(string)
+  default     = []
+}
+
+variable "option_group_option_db_security_group_memberships" {
+  description = "List of list of DB Security Groups for which the option is enabled."
+  type        = list(list(string))
+  default     = [[]]
+}
+
+variable "option_group_option_vpc_security_group_memberships" {
+  description = "List of list of VPC Security Groups for which the option is enabled."
+  type        = list(list(string))
+  default     = [[]]
+}
+
+variable "option_group_option_settings" {
+  description = "list of list of maps of option settings"
+  type = list(list(object({
+    name  = string,
+    value = string,
+  })))
+  default = [[]]
 }
 
 variable "option_group_tags" {
