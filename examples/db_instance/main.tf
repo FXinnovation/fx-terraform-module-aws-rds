@@ -13,55 +13,37 @@ resource "random_string" "this" {
 
 }
 
-module "rds_cluster" {
+module "db_instance" {
   source = "../../"
 
   #####
   # Common
   #####
 
-  engine                     = "aurora-mysql"
-  engine_version             = "5.7.mysql_aurora.2.07.1"
+  engine                     = "postgres"
+  engine_version             = "9.6.9"
   deletion_protection        = false
   apply_immediately          = true
-  auto_minor_version_upgrade = true
+  auto_minor_version_upgrade = false
   database_identifier        = "tftest"
   database_name              = format("%s%s", random_string.this.result, "tftest")
   master_password            = format("%s%s", random_string.this.result, "tftest")
   master_username            = format("%s%s", random_string.this.result, "tftest")
+  backup_retention_period    = 0
   skip_final_snapshot        = true
   use_num_suffix             = true
-  num_suffix_digits          = 3
   prefix                     = random_string.this.result
-  tags = {
-    terraformtest = true
-  }
 
   #####
   # DB instance
   #####
 
-  rds_instance_availability_zones = ["ca-central-1a", "ca-central-1b"]
-  rds_instance_instance_classes   = ["db.t3.medium", "db.t3.medium"]
-  rds_instance_promotion_tiers    = [0, 1]
-  db_instance_global_tags = {
-    dbglobaltags = "common"
-  }
-  db_instance_tags = [
-    {
-      dbinstancetag = "tftest"
-    },
-    {}
-  ]
-
-  #####
-  # RDS cluster
-  #####
-
-  rds_cluster_identifier = "tftest"
-  rds_cluster_tags = {
-    dbclustertag = "tftest"
-  }
+  db_instance_instance_class              = "db.t3.large"
+  db_instance_allocated_storage           = 5
+  db_instance_allow_major_version_upgrade = false
+  db_instance_max_allocated_storage       = 20
+  db_instance_multi_az                    = true
+  db_instance_storage_type                = "gp2"
 
   #####
   # DB subnet
@@ -77,7 +59,10 @@ module "rds_cluster" {
   # KMS key
   #####
 
-  use_default_kms_key = true
+  use_default_kms_key  = false
+  kms_key_name         = "tftest"
+  kms_key_create       = true
+  kms_key_create_alias = false
 
   #####
   # Security group

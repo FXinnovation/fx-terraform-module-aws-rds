@@ -1,25 +1,57 @@
-output "db_subnet_group_id" {
-  value = module.disable.db_subnet_group_id
+output "resource_id" {
+  value = module.disable.resource_id
 }
 
-output "db_subnet_group_arn" {
-  value = module.disable.db_subnet_group_arn
+output "endpoint" {
+  value = module.disable.endpoint
 }
 
-output "kms_key_id" {
-  value = module.disable.kms_key_id
+output "engine" {
+  value = module.disable.engine
 }
 
-output "kms_key_arn" {
-  value = module.disable.kms_key_arn
+output "engine_version" {
+  value = module.disable.engine_version
 }
 
-output "kms_key_alias_arn" {
-  value = module.disable.kms_key_alias_arn
+output "database_name" {
+  value = module.disable.database_name
 }
 
-output "kms_key_alias_target_key_arn" {
-  value = module.disable.kms_key_alias_target_key_arn
+output "port" {
+  value = module.disable.port
+}
+
+output "master_username" {
+  value = module.disable.master_username
+}
+
+output "backup_retention_period" {
+  value = module.disable.backup_retention_period
+}
+
+output "preferred_backup_window" {
+  value = module.disable.preferred_backup_window
+}
+
+output "maintenance_window" {
+  value = module.disable.maintenance_window
+}
+
+output "hosted_zone_id" {
+  value = module.disable.hosted_zone_id
+}
+
+output "instance_arns" {
+  value = module.disable.instance_arns
+}
+
+output "instance_ids" {
+  value = module.disable.instance_ids
+}
+
+output "availability_zones" {
+  value = module.disable.availability_zones
 }
 
 output "rds_cluster_arn" {
@@ -34,10 +66,6 @@ output "rds_cluster_cluster_identifier" {
   value = module.disable.rds_cluster_cluster_identifier
 }
 
-output "rds_cluster_cluster_resource_id" {
-  value = module.disable.rds_cluster_cluster_resource_id
-}
-
 output "rds_cluster_cluster_members" {
   value = module.disable.rds_cluster_cluster_members
 }
@@ -46,44 +74,8 @@ output "rds_cluster_availability_zones" {
   value = module.disable.rds_cluster_availability_zones
 }
 
-output "rds_cluster_backup_retention_period" {
-  value = module.disable.rds_cluster_backup_retention_period
-}
-
-output "rds_cluster_preferred_backup_window" {
-  value = module.disable.rds_cluster_preferred_backup_window
-}
-
-output "rds_cluster_preferred_maintenance_window" {
-  value = module.disable.rds_cluster_preferred_maintenance_window
-}
-
-output "rds_cluster_endpoint" {
-  value = module.disable.rds_cluster_endpoint
-}
-
 output "rds_cluster_reader_endpoint" {
   value = module.disable.rds_cluster_reader_endpoint
-}
-
-output "rds_cluster_engine" {
-  value = module.disable.rds_cluster_engine
-}
-
-output "rds_cluster_engine_version" {
-  value = module.disable.rds_cluster_engine_version
-}
-
-output "rds_cluster_database_name" {
-  value = module.disable.rds_cluster_database_name
-}
-
-output "rds_cluster_port" {
-  value = module.disable.rds_cluster_port
-}
-
-output "rds_cluster_master_username" {
-  value = module.disable.rds_cluster_master_username
 }
 
 output "rds_cluster_storage_encrypted" {
@@ -94,14 +86,6 @@ output "rds_cluster_replication_source_identifier" {
   value = module.disable.rds_cluster_replication_source_identifier
 }
 
-output "rds_cluster_hosted_zone_id" {
-  value = module.disable.rds_cluster_hosted_zone_id
-}
-
-output "rds_cluster_instance_arns" {
-  value = module.disable.rds_cluster_instance_arns
-}
-
 output "rds_cluster_instance_cluster_identifiers" {
   value = module.disable.rds_cluster_instance_cluster_identifiers
 }
@@ -110,16 +94,8 @@ output "rds_cluster_instance_identifiers" {
   value = module.disable.rds_cluster_instance_identifiers
 }
 
-output "rds_cluster_instance_ids" {
-  value = module.disable.rds_cluster_instance_ids
-}
-
 output "rds_cluster_instance_writers" {
   value = module.disable.rds_cluster_instance_writers
-}
-
-output "rds_cluster_instance_availability_zones" {
-  value = module.disable.rds_cluster_instance_availability_zones
 }
 
 output "rds_cluster_instance_endpoints" {
@@ -158,12 +134,64 @@ output "rds_cluster_instance_performance_insights_kms_key_ids" {
   value = module.disable.rds_cluster_instance_performance_insights_kms_key_ids
 }
 
-output "rds_cluster_parameter_group_id" {
-  value = module.disable.rds_cluster_parameter_group_id
+output "db_instance_allocated_storage" {
+  value = module.disable.db_instance_allocated_storage
 }
 
-output "rds_cluster_parameter_group_arn" {
-  value = module.disable.rds_cluster_parameter_group_arn
+output "db_instance_domain" {
+  value = module.disable.db_instance_domain
+}
+
+output "db_instance_domain_iam_role_name" {
+  value = module.disable.db_instance_domain_iam_role_name
+}
+
+output "db_instance_multi_az" {
+  value = module.disable.db_instance_multi_az
+}
+
+output "db_instance_character_set_name" {
+  value = module.disable.db_instance_character_set_name
+}
+
+output "parameter_group_id" {
+  value = module.disable.parameter_group_id
+}
+
+output "parameter_group_arn" {
+  value = module.disable.parameter_group_arn
+}
+
+output "db_subnet_group_id" {
+  value = module.disable.db_subnet_group_id
+}
+
+output "db_subnet_group_arn" {
+  value = module.disable.db_subnet_group_arn
+}
+
+output "option_group_id" {
+  value = module.disable.option_group_id
+}
+
+output "option_group_arn" {
+  value = module.disable.option_group_arn
+}
+
+output "kms_key_id" {
+  value = module.disable.kms_key_id
+}
+
+output "kms_key_arn" {
+  value = module.disable.kms_key_arn
+}
+
+output "kms_key_alias_arn" {
+  value = module.disable.kms_key_alias_arn
+}
+
+output "kms_key_alias_target_key_arn" {
+  value = module.disable.kms_key_alias_target_key_arn
 }
 
 output "security_group_id" {

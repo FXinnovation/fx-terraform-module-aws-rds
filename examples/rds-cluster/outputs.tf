@@ -1,25 +1,57 @@
-output "db_subnet_group_id" {
-  value = module.rds_cluster.db_subnet_group_id
+output "resource_id" {
+  value = module.rds_cluster.resource_id
 }
 
-output "db_subnet_group_arn" {
-  value = module.rds_cluster.db_subnet_group_arn
+output "endpoint" {
+  value = module.rds_cluster.endpoint
 }
 
-output "kms_key_id" {
-  value = module.rds_cluster.kms_key_id
+output "engine" {
+  value = module.rds_cluster.engine
 }
 
-output "kms_key_arn" {
-  value = module.rds_cluster.kms_key_arn
+output "engine_version" {
+  value = module.rds_cluster.engine_version
 }
 
-output "kms_key_alias_arn" {
-  value = module.rds_cluster.kms_key_alias_arn
+output "database_name" {
+  value = module.rds_cluster.database_name
 }
 
-output "kms_key_alias_target_key_arn" {
-  value = module.rds_cluster.kms_key_alias_target_key_arn
+output "port" {
+  value = module.rds_cluster.port
+}
+
+output "master_username" {
+  value = module.rds_cluster.master_username
+}
+
+output "backup_retention_period" {
+  value = module.rds_cluster.backup_retention_period
+}
+
+output "preferred_backup_window" {
+  value = module.rds_cluster.preferred_backup_window
+}
+
+output "maintenance_window" {
+  value = module.rds_cluster.maintenance_window
+}
+
+output "hosted_zone_id" {
+  value = module.rds_cluster.hosted_zone_id
+}
+
+output "instance_arns" {
+  value = module.rds_cluster.instance_arns
+}
+
+output "instance_ids" {
+  value = module.rds_cluster.instance_ids
+}
+
+output "availability_zones" {
+  value = module.rds_cluster.availability_zones
 }
 
 output "rds_cluster_arn" {
@@ -34,10 +66,6 @@ output "rds_cluster_cluster_identifier" {
   value = module.rds_cluster.rds_cluster_cluster_identifier
 }
 
-output "rds_cluster_cluster_resource_id" {
-  value = module.rds_cluster.rds_cluster_cluster_resource_id
-}
-
 output "rds_cluster_cluster_members" {
   value = module.rds_cluster.rds_cluster_cluster_members
 }
@@ -46,44 +74,8 @@ output "rds_cluster_availability_zones" {
   value = module.rds_cluster.rds_cluster_availability_zones
 }
 
-output "rds_cluster_backup_retention_period" {
-  value = module.rds_cluster.rds_cluster_backup_retention_period
-}
-
-output "rds_cluster_preferred_backup_window" {
-  value = module.rds_cluster.rds_cluster_preferred_backup_window
-}
-
-output "rds_cluster_preferred_maintenance_window" {
-  value = module.rds_cluster.rds_cluster_preferred_maintenance_window
-}
-
-output "rds_cluster_endpoint" {
-  value = module.rds_cluster.rds_cluster_endpoint
-}
-
 output "rds_cluster_reader_endpoint" {
   value = module.rds_cluster.rds_cluster_reader_endpoint
-}
-
-output "rds_cluster_engine" {
-  value = module.rds_cluster.rds_cluster_engine
-}
-
-output "rds_cluster_engine_version" {
-  value = module.rds_cluster.rds_cluster_engine_version
-}
-
-output "rds_cluster_database_name" {
-  value = module.rds_cluster.rds_cluster_database_name
-}
-
-output "rds_cluster_port" {
-  value = module.rds_cluster.rds_cluster_port
-}
-
-output "rds_cluster_master_username" {
-  value = module.rds_cluster.rds_cluster_master_username
 }
 
 output "rds_cluster_storage_encrypted" {
@@ -94,14 +86,6 @@ output "rds_cluster_replication_source_identifier" {
   value = module.rds_cluster.rds_cluster_replication_source_identifier
 }
 
-output "rds_cluster_hosted_zone_id" {
-  value = module.rds_cluster.rds_cluster_hosted_zone_id
-}
-
-output "rds_cluster_instance_arns" {
-  value = module.rds_cluster.rds_cluster_instance_arns
-}
-
 output "rds_cluster_instance_cluster_identifiers" {
   value = module.rds_cluster.rds_cluster_instance_cluster_identifiers
 }
@@ -110,16 +94,8 @@ output "rds_cluster_instance_identifiers" {
   value = module.rds_cluster.rds_cluster_instance_identifiers
 }
 
-output "rds_cluster_instance_ids" {
-  value = module.rds_cluster.rds_cluster_instance_ids
-}
-
 output "rds_cluster_instance_writers" {
   value = module.rds_cluster.rds_cluster_instance_writers
-}
-
-output "rds_cluster_instance_availability_zones" {
-  value = module.rds_cluster.rds_cluster_instance_availability_zones
 }
 
 output "rds_cluster_instance_endpoints" {
@@ -158,12 +134,64 @@ output "rds_cluster_instance_performance_insights_kms_key_ids" {
   value = module.rds_cluster.rds_cluster_instance_performance_insights_kms_key_ids
 }
 
-output "rds_cluster_parameter_group_id" {
-  value = module.rds_cluster.rds_cluster_parameter_group_id
+output "db_instance_allocated_storage" {
+  value = module.rds_cluster.db_instance_allocated_storage
 }
 
-output "rds_cluster_parameter_group_arn" {
-  value = module.rds_cluster.rds_cluster_parameter_group_arn
+output "db_instance_domain" {
+  value = module.rds_cluster.db_instance_domain
+}
+
+output "db_instance_domain_iam_role_name" {
+  value = module.rds_cluster.db_instance_domain_iam_role_name
+}
+
+output "db_instance_multi_az" {
+  value = module.rds_cluster.db_instance_multi_az
+}
+
+output "db_instance_character_set_name" {
+  value = module.rds_cluster.db_instance_character_set_name
+}
+
+output "parameter_group_id" {
+  value = module.rds_cluster.parameter_group_id
+}
+
+output "parameter_group_arn" {
+  value = module.rds_cluster.parameter_group_arn
+}
+
+output "db_subnet_group_id" {
+  value = module.rds_cluster.db_subnet_group_id
+}
+
+output "db_subnet_group_arn" {
+  value = module.rds_cluster.db_subnet_group_arn
+}
+
+output "option_group_id" {
+  value = module.rds_cluster.option_group_id
+}
+
+output "option_group_arn" {
+  value = module.rds_cluster.option_group_arn
+}
+
+output "kms_key_id" {
+  value = module.rds_cluster.kms_key_id
+}
+
+output "kms_key_arn" {
+  value = module.rds_cluster.kms_key_arn
+}
+
+output "kms_key_alias_arn" {
+  value = module.rds_cluster.kms_key_alias_arn
+}
+
+output "kms_key_alias_target_key_arn" {
+  value = module.rds_cluster.kms_key_alias_target_key_arn
 }
 
 output "security_group_id" {

@@ -28,6 +28,7 @@ module "kms_key" {
   database_name              = format("%s%s", random_string.this.result, "tftest")
   master_password            = format("%s%s", random_string.this.result, "tftest")
   master_username            = format("%s%s", random_string.this.result, "tftest")
+  skip_final_snapshot        = true
   use_num_suffix             = true
   prefix                     = random_string.this.result
   tags = {
@@ -38,16 +39,15 @@ module "kms_key" {
   # DB instance
   #####
 
-  db_instance_availability_zones = ["ca-central-1a"]
-  db_instance_instance_classes   = ["db.t3.medium"]
-  db_instance_promotion_tiers    = [0]
+  rds_instance_availability_zones = ["ca-central-1a"]
+  rds_instance_instance_classes   = ["db.t3.medium"]
+  rds_instance_promotion_tiers    = [0]
 
   #####
   # RDS cluster
   #####
 
-  rds_cluster_identifier          = "tftest"
-  rds_cluster_skip_final_snapshot = true
+  rds_cluster_identifier = "tftest"
 
   #####
   # DB subnet

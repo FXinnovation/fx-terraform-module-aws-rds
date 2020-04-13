@@ -53,6 +53,7 @@ module "external_kms_external_security_group_no_subnet_group" {
   database_identifier        = random_string.this.result
   master_password            = format("%s%s", random_string.this.result, "tftest")
   master_username            = format("%s%s", random_string.this.result, "tftest")
+  skip_final_snapshot        = true
   use_num_suffix             = false
   prefix                     = random_string.this.result
 
@@ -60,16 +61,15 @@ module "external_kms_external_security_group_no_subnet_group" {
   # DB instance
   #####
 
-  db_instance_availability_zones = ["ca-central-1a"]
-  db_instance_instance_classes   = ["db.t3.medium"]
-  db_instance_promotion_tiers    = [0]
+  rds_instance_availability_zones = ["ca-central-1a"]
+  rds_instance_instance_classes   = ["db.t3.medium"]
+  rds_instance_promotion_tiers    = [0]
 
   #####
   # RDS cluster
   #####
 
-  rds_cluster_identifier          = "tftest"
-  rds_cluster_skip_final_snapshot = true
+  rds_cluster_identifier = "tftest"
 
   #####
   # DB subnet
@@ -81,9 +81,9 @@ module "external_kms_external_security_group_no_subnet_group" {
   # DB cluster parameter group
   #####
 
-  rds_cluster_parameter_group_family = "aurora-mysql5.7"
-  rds_cluster_parameter_group_name   = "tftest"
-  rds_cluster_parameter_group_parameters = [
+  parameter_group_family = "aurora-mysql5.7"
+  parameter_group_name   = "tftest"
+  parameter_group_parameters = [
     {
       name         = "aurora_lab_mode"
       value        = "1"
@@ -95,7 +95,7 @@ module "external_kms_external_security_group_no_subnet_group" {
       apply_method = null
     }
   ]
-  rds_cluster_parameter_group_tags = {
+  parameter_group_tags = {
     tftest = true
   }
 

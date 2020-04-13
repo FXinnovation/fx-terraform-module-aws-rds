@@ -3,40 +3,35 @@ locals {
     managed-by = "terraform"
     Terraform  = "True"
   }
-
-  description = var.description != null ? var.description : format("For %s %s", local.is_aurora ? "RDS cluster" : "DB instance", var.database_identifier)
-
-  security_group_needed  = length(var.security_group_source_cidrs) > 0 || length(var.security_group_source_security_group) > 0
-  db_subnet_group_needed = length(var.db_subnet_group_subnet_ids) > 0
-  is_aurora              = replace(var.engine != null ? var.engine : "", "/^aurora{1}.*$/", "1") == "1" ? true : false
-
-  #####
-  # RDS
-  #####
-
-  rds_cluster_parameter_group_needed = local.is_aurora && length(var.rds_cluster_parameter_group_parameters) > 0
+  description = format("For %s %s", local.is_aurora ? "RDS cluster" : "DB instance", var.database_identifier)
+  is_aurora   = replace(var.engine != null ? var.engine : "", "/^aurora{1}.*$/", "1") == "1" ? true : false
 }
 
 resource "random_id" "final_snapshot" {
   count = var.enable && var.final_snapshot_identifier_prefix != null ? 1 : 0
 
-  // To create this list, please select all parameters with the flag ForceNew on this page :
+  // To create this list, please select all parameters with the flag ForceNew on those pages :
   // https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_rds_cluster.go
+  // https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_db_instance.go
   keepers = {
     cluster_identifier    = var.rds_cluster_identifier
     database_name         = var.database_name
     db_subnet_group_name  = local.db_subnet_group_needed ? element(concat(aws_db_subnet_group.this.*.name, [""]), 0) : var.db_subnet_group_name
     engine                = var.engine
     engine_mode           = var.engine_mode
-    bucket_name           = var.rds_cluster_s3_import_bucket_name
-    bucket_prefix         = var.rds_cluster_s3_import_bucket_prefix
-    ingestion_role        = var.rds_cluster_s3_import_ingestion_role
-    source_engine         = var.rds_cluster_s3_import_source_engine
-    source_engine_version = var.rds_cluster_s3_import_source_engine_version
+    bucket_name           = var.s3_import_bucket_name
+    bucket_prefix         = var.s3_import_bucket_prefix
+    ingestion_role        = var.s3_import_ingestion_role
+    source_engine         = var.s3_import_source_engine
+    source_engine_version = var.s3_import_source_engine_version
     master_username       = var.master_username
     port                  = var.port
     kms_key_id            = var.kms_key_create ? element(concat(aws_kms_key.this.*.arn, [""]), 0) : var.use_default_kms_key ? var.kms_key_id : null
     source_region         = var.rds_cluster_source_region
+    character_set_name    = var.db_instance_character_set_name
+    availability_zone     = var.db_instance_availability_zone
+    snapshot_identifier   = var.snapshot_identifier
+    timezone              = var.db_instance_timezone
   }
 
   byte_length = 5
@@ -45,6 +40,10 @@ resource "random_id" "final_snapshot" {
 #####
 # Common resources
 #####
+
+locals {
+  db_subnet_group_needed = length(var.db_subnet_group_subnet_ids) > 0
+}
 
 resource "aws_db_subnet_group" "this" {
   count = var.enable && local.db_subnet_group_needed ? 1 : 0
@@ -101,7 +100,7 @@ resource "aws_rds_cluster" "this" {
 
   source_region                   = var.rds_cluster_source_region
   db_subnet_group_name            = local.db_subnet_group_needed ? element(concat(aws_db_subnet_group.this.*.name, [""]), 0) : var.db_subnet_group_name
-  db_cluster_parameter_group_name = local.rds_cluster_parameter_group_needed ? element(concat(aws_rds_cluster_parameter_group.this.*.id, [""]), 0) : var.rds_cluster_parameter_group_name
+  db_cluster_parameter_group_name = local.rds_cluster_parameter_group_needed ? element(concat(aws_rds_cluster_parameter_group.this.*.id, [""]), 0) : var.parameter_group_name
 
   copy_tags_to_snapshot = var.copy_tags_to_snapshot
 
@@ -112,10 +111,10 @@ resource "aws_rds_cluster" "this" {
   vpc_security_group_ids = concat(aws_security_group.this.*.id, var.additionnal_security_group)
 
   deletion_protection       = var.deletion_protection
-  skip_final_snapshot       = var.rds_cluster_skip_final_snapshot
+  skip_final_snapshot       = var.skip_final_snapshot
   final_snapshot_identifier = var.final_snapshot_identifier_prefix != null ? format("%s%s-%s", var.prefix, var.final_snapshot_identifier_prefix, element(concat(random_id.final_snapshot.*.dec, [""]), 0)) : null
 
-  snapshot_identifier = var.rds_cluster_snapshot_identifier
+  snapshot_identifier = var.snapshot_identifier
 
   backtrack_window             = var.backtrack_window
   backup_retention_period      = var.backup_retention_period
@@ -132,12 +131,12 @@ resource "aws_rds_cluster" "this" {
   kms_key_id        = var.kms_key_create ? element(concat(aws_kms_key.this.*.arn, [""]), 0) : var.use_default_kms_key ? var.kms_key_id : null
 
   iam_roles                           = var.rds_cluster_iam_roles
-  iam_database_authentication_enabled = var.rds_cluster_iam_database_authentication_enabled
+  iam_database_authentication_enabled = var.iam_database_authentication_enabled
 
   engine                          = var.engine
   engine_mode                     = var.engine_mode
   engine_version                  = var.engine_version
-  enabled_cloudwatch_logs_exports = var.rds_cluster_enabled_cloudwatch_logs_exports
+  enabled_cloudwatch_logs_exports = var.cloudwatch_logs_exports
 
   dynamic "scaling_configuration" {
     for_each = var.rds_cluster_enable_scaling_configuration ? [1] : []
@@ -152,14 +151,14 @@ resource "aws_rds_cluster" "this" {
   }
 
   dynamic "s3_import" {
-    for_each = var.rds_cluster_enable_s3_import ? [1] : []
+    for_each = var.enable_s3_import ? [1] : []
 
     content {
-      source_engine         = var.rds_cluster_s3_import_source_engine
-      source_engine_version = var.rds_cluster_s3_import_source_engine_version
-      bucket_name           = var.rds_cluster_s3_import_bucket_name
-      bucket_prefix         = var.rds_cluster_s3_import_bucket_prefix
-      ingestion_role        = var.rds_cluster_s3_import_ingestion_role
+      source_engine         = var.s3_import_source_engine
+      source_engine_version = var.s3_import_source_engine_version
+      bucket_name           = var.s3_import_bucket_name
+      bucket_prefix         = var.s3_import_bucket_prefix
+      ingestion_role        = var.s3_import_ingestion_role
     }
   }
 
@@ -177,27 +176,27 @@ resource "aws_rds_cluster" "this" {
 
 
 resource "aws_rds_cluster_instance" "this" {
-  count = var.enable && local.is_aurora ? length(var.db_instance_instance_classes) : 0
+  count = var.enable && local.is_aurora ? length(var.rds_instance_instance_classes) : 0
 
   identifier                      = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.database_identifier, (count.index + 1)) : format("%s%s-%02d", var.prefix, var.database_identifier, count.index + 1)
   cluster_identifier              = element(concat(aws_rds_cluster.this.*.id, [""]), 0)
   engine                          = var.engine
   engine_version                  = var.engine_version
-  instance_class                  = var.db_instance_instance_classes[count.index]
-  publicly_accessible             = var.db_instance_publicly_accessible
+  instance_class                  = var.rds_instance_instance_classes[count.index]
+  publicly_accessible             = var.publicly_accessible
   db_subnet_group_name            = local.db_subnet_group_needed ? element(concat(aws_db_subnet_group.this.*.name, [""]), 0) : var.db_subnet_group_name
   apply_immediately               = var.apply_immediately
-  monitoring_role_arn             = var.db_instance_monitoring_role_arn
-  monitoring_interval             = var.db_instance_monitoring_interval
-  promotion_tier                  = var.db_instance_promotion_tiers != null ? var.db_instance_promotion_tiers[count.index] : null
-  availability_zone               = var.db_instance_availability_zones[count.index]
+  monitoring_role_arn             = var.monitoring_role_arn
+  monitoring_interval             = var.monitoring_interval
+  promotion_tier                  = var.rds_instance_promotion_tiers != null ? var.rds_instance_promotion_tiers[count.index] : null
+  availability_zone               = var.rds_instance_availability_zones[count.index]
   preferred_backup_window         = var.preferred_backup_window
   preferred_maintenance_window    = var.preferred_maintenance_window
   auto_minor_version_upgrade      = var.auto_minor_version_upgrade
-  performance_insights_enabled    = var.db_instance_performance_insights_enabled
-  performance_insights_kms_key_id = var.db_instance_performance_insights_kms_key_id
+  performance_insights_enabled    = var.performance_insights_enabled
+  performance_insights_kms_key_id = var.performance_insights_kms_key_id
   copy_tags_to_snapshot           = var.copy_tags_to_snapshot
-  ca_cert_identifier              = var.db_instance_ca_cert_identifier
+  ca_cert_identifier              = var.ca_cert_identifier
   tags = merge(
     var.tags,
     var.db_instance_global_tags,
@@ -209,16 +208,19 @@ resource "aws_rds_cluster_instance" "this" {
   )
 }
 
+locals {
+  rds_cluster_parameter_group_needed = local.is_aurora && length(var.parameter_group_parameters) > 0
+}
 
 resource "aws_rds_cluster_parameter_group" "this" {
   count = var.enable && local.rds_cluster_parameter_group_needed ? 1 : 0
 
-  name        = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.rds_cluster_parameter_group_name, count.index + 1) : format("%s%s", var.prefix, var.rds_cluster_parameter_group_name)
-  family      = var.rds_cluster_parameter_group_family
+  name        = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.parameter_group_name, count.index + 1) : format("%s%s", var.prefix, var.parameter_group_name)
+  family      = var.parameter_group_family
   description = local.description
 
   dynamic "parameter" {
-    for_each = var.rds_cluster_parameter_group_parameters
+    for_each = var.parameter_group_parameters
 
     content {
       name         = parameter.value.name
@@ -229,9 +231,160 @@ resource "aws_rds_cluster_parameter_group" "this" {
 
   tags = merge(
     var.tags,
-    var.rds_cluster_parameter_group_tags,
+    var.parameter_group_tags,
     {
-      Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.rds_cluster_parameter_group_name, count.index + 1) : format("%s%s", var.prefix, var.rds_cluster_parameter_group_name)
+      Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.parameter_group_name, count.index + 1) : format("%s%s", var.prefix, var.parameter_group_name)
+    },
+    local.tags,
+  )
+}
+
+#####
+# DB instance
+#####
+
+resource "aws_db_instance" "this" {
+  count = var.enable && ! local.is_aurora ? 1 : 0
+
+  allocated_storage                     = var.db_instance_allocated_storage
+  allow_major_version_upgrade           = var.db_instance_allow_major_version_upgrade
+  apply_immediately                     = var.apply_immediately
+  auto_minor_version_upgrade            = var.auto_minor_version_upgrade
+  availability_zone                     = var.db_instance_availability_zone
+  backup_retention_period               = var.backup_retention_period
+  backup_window                         = var.preferred_backup_window
+  ca_cert_identifier                    = var.ca_cert_identifier
+  character_set_name                    = var.db_instance_character_set_name
+  copy_tags_to_snapshot                 = var.copy_tags_to_snapshot
+  db_subnet_group_name                  = local.db_subnet_group_needed ? element(concat(aws_db_subnet_group.this.*.name, [""]), 0) : var.db_subnet_group_name
+  delete_automated_backups              = var.db_instance_delete_automated_backups
+  deletion_protection                   = var.deletion_protection
+  domain                                = var.db_instance_domain
+  domain_iam_role_name                  = var.db_instance_domain_iam_role_name
+  enabled_cloudwatch_logs_exports       = var.cloudwatch_logs_exports
+  engine                                = var.engine
+  engine_version                        = var.engine_version
+  final_snapshot_identifier             = var.final_snapshot_identifier_prefix != null ? format("%s%s-%s", var.prefix, var.final_snapshot_identifier_prefix, element(concat(random_id.final_snapshot.*.dec, [""]), 0)) : null
+  iam_database_authentication_enabled   = var.iam_database_authentication_enabled
+  identifier                            = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.database_identifier, (count.index + 1)) : format("%s%s-%02d", var.prefix, var.database_identifier, count.index + 1)
+  instance_class                        = var.db_instance_instance_class
+  iops                                  = var.db_instance_iops
+  kms_key_id                            = var.kms_key_create ? element(concat(aws_kms_key.this.*.arn, [""]), 0) : var.use_default_kms_key ? var.kms_key_id : null
+  license_model                         = var.db_instance_license_model
+  maintenance_window                    = var.preferred_maintenance_window
+  max_allocated_storage                 = var.db_instance_max_allocated_storage
+  monitoring_interval                   = var.monitoring_interval
+  monitoring_role_arn                   = var.monitoring_role_arn
+  multi_az                              = var.db_instance_multi_az
+  name                                  = var.database_name
+  option_group_name                     = local.db_option_group_needed ? element(concat(aws_db_option_group.this.*.id, [""]), 0) : var.option_group_name
+  parameter_group_name                  = local.db_parameter_group_needed ? element(concat(aws_db_parameter_group.this.*.id, [""]), 0) : var.parameter_group_name
+  password                              = var.master_password
+  port                                  = var.port
+  publicly_accessible                   = var.publicly_accessible
+  replicate_source_db                   = var.db_instance_replicate_source_db
+  skip_final_snapshot                   = var.skip_final_snapshot
+  snapshot_identifier                   = var.snapshot_identifier
+  storage_encrypted                     = true
+  storage_type                          = var.db_instance_storage_type
+  timezone                              = var.db_instance_timezone
+  username                              = var.master_username
+  vpc_security_group_ids                = concat(aws_security_group.this.*.id, var.additionnal_security_group)
+  performance_insights_enabled          = var.performance_insights_enabled
+  performance_insights_kms_key_id       = var.performance_insights_kms_key_id
+  performance_insights_retention_period = var.db_instance_performance_insights_retention_period
+
+  dynamic "s3_import" {
+    for_each = var.enable_s3_import ? [1] : []
+
+    content {
+      source_engine         = var.s3_import_source_engine
+      source_engine_version = var.s3_import_source_engine_version
+      bucket_name           = var.s3_import_bucket_name
+      bucket_prefix         = var.s3_import_bucket_prefix
+      ingestion_role        = var.s3_import_ingestion_role
+    }
+  }
+
+  tags = merge({
+    Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.database_identifier, (count.index + 1)) : format("%s%s-%02d", var.prefix, var.database_identifier, count.index + 1)
+    },
+    length(var.db_instance_tags) > 0 ? var.db_instance_tags[count.index] : {},
+    local.tags,
+    var.db_instance_global_tags,
+    var.tags
+  )
+}
+
+locals {
+  db_parameter_group_needed = ! local.is_aurora && length(var.parameter_group_parameters) > 0
+}
+
+resource "aws_db_parameter_group" "this" {
+  count = var.enable && local.db_parameter_group_needed ? 1 : 0
+
+  name        = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.parameter_group_name, count.index + 1) : format("%s%s", var.prefix, var.parameter_group_name)
+  family      = var.parameter_group_family
+  description = local.description
+
+  dynamic "parameter" {
+    for_each = var.parameter_group_parameters
+
+    content {
+      name         = parameter.value.name
+      value        = parameter.value.value
+      apply_method = parameter.value.apply_method
+    }
+  }
+
+  tags = merge(
+    var.tags,
+    var.parameter_group_tags,
+    {
+      Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.parameter_group_name, count.index + 1) : format("%s%s", var.prefix, var.parameter_group_name)
+    },
+    local.tags,
+  )
+}
+
+locals {
+  db_option_group_needed = ! local.is_aurora && length(var.option_group_options) > 0
+}
+
+resource "aws_db_option_group" "this" {
+  count = var.enable && local.db_option_group_needed ? 1 : 0
+
+  name                     = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.option_group_name, count.index + 1) : format("%s%s", var.prefix, var.option_group_name)
+  option_group_description = local.description
+  engine_name              = var.option_group_engine_name
+  major_engine_version     = var.option_group_major_engine_version
+
+  dynamic "option" {
+    for_each = var.option_group_options
+
+    content {
+      option_name                    = option.value.option_name
+      port                           = lookup(option.value, "port", null)
+      version                        = lookup(option.value, "version", null)
+      db_security_group_memberships  = lookup(option.value, "db_security_group_memberships", null)
+      vpc_security_group_memberships = lookup(option.value, "vpc_security_group_memberships", null)
+
+      dynamic "option_settings" {
+        for_each = option.value.option_settings
+
+        content {
+          name  = option_settings.value.name
+          value = option_settings.value.value
+        }
+      }
+    }
+  }
+
+  tags = merge(
+    var.tags,
+    var.option_group_tags,
+    {
+      Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.option_group_name, count.index + 1) : format("%s%s", var.prefix, var.option_group_name)
     },
     local.tags,
   )
@@ -240,6 +393,10 @@ resource "aws_rds_cluster_parameter_group" "this" {
 #####
 # Security group
 #####
+
+locals {
+  security_group_needed = length(var.security_group_source_cidrs) > 0 || length(var.security_group_source_security_group) > 0
+}
 
 resource "aws_security_group" "this" {
   count = var.enable && local.security_group_needed ? 1 : 0

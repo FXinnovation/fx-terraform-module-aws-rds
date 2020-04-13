@@ -1,6 +1,6 @@
-# RDS cluster with KMS key creation example
+# RDS standard example
 
-Create a RDS cluster with a KMS key.
+Create a standard RDS instance with an option group.
 
 ## Usage
 

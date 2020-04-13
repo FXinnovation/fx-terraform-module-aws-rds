@@ -98,6 +98,18 @@ variable "master_username" {
   default     = null
 }
 
+variable "snapshot_identifier" {
+  description = "The name of your final DB snapshot when this DB cluster is deleted."
+  type        = string
+  default     = null
+}
+
+variable "iam_database_authentication_enabled" {
+  description = "Specifies whether or mappings of AWS Identity and Access Management (IAM) accounts to database accounts is enabled."
+  type        = bool
+  default     = false
+}
+
 variable "use_num_suffix" {
   description = "Always append numerical suffix to all resources."
   default     = true
@@ -145,26 +157,46 @@ variable "tags" {
   default     = {}
 }
 
-#####
-# DB instance
-#####
+variable "cloudwatch_logs_exports" {
+  description = "List of log types to export to cloudwatch."
+  type        = list(string)
+  default     = []
+}
 
-variable "db_instance_ca_cert_identifier" {
-  description = "The identifier of the CA certificate for the DB instance."
+variable "enable_s3_import" {
+  description = "Enable S3 import"
+  type        = bool
+  default     = false
+}
+
+variable "s3_import_bucket_name" {
+  description = "The bucket name where your backup is stored."
   type        = string
   default     = null
 }
 
-variable "db_instance_availability_zones" {
-  description = "List of the EC2 Availability Zone that each DB instance are created in."
-  type        = list(string)
-  default     = []
+variable "s3_import_bucket_prefix" {
+  description = "Can be blank, but is the path to your backup"
+  type        = string
+  default     = null
 }
 
-variable "db_instance_instance_classes" {
-  description = "List of instance classes to use."
-  type        = list(string)
-  default     = []
+variable "s3_import_ingestion_role" {
+  description = "Role applied to load the data."
+  type        = string
+  default     = null
+}
+
+variable "s3_import_source_engine" {
+  description = "Source engine for the backup "
+  type        = string
+  default     = null
+}
+
+variable "s3_import_source_engine_version" {
+  description = "Version of source engine for the backup "
+  type        = string
+  default     = null
 }
 
 variable "db_instance_promotion_tiers" {
@@ -172,6 +204,43 @@ variable "db_instance_promotion_tiers" {
   type        = list(number)
   default     = null
 }
+
+variable "ca_cert_identifier" {
+  description = "he daily time range during which automated backups are created if automated backups are enabled using the BackupRetentionPeriod parameter.Time in UTC"
+  type        = string
+  default     = null
+}
+
+variable "monitoring_interval" {
+  description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance."
+  type        = number
+  default     = null
+}
+
+variable "monitoring_role_arn" {
+  description = "The ARN for the IAM role that permits RDS to send enhanced monitoring metrics to CloudWatch Logs."
+  type        = string
+  default     = null
+}
+
+variable "performance_insights_enabled" {
+  description = "Specifies whether Performance Insights is enabled or not."
+  type        = bool
+  default     = false
+}
+
+variable "performance_insights_kms_key_id" {
+  description = "The ARN for the KMS key to encrypt Performance Insights data."
+  type        = string
+  default     = null
+}
+
+variable "publicly_accessible" {
+  description = "Bool to control if instance is publicly accessible."
+  type        = bool
+  default     = false
+}
+
 
 variable "db_instance_tags" {
   description = "List of Tags to be merge to each db instances"
@@ -185,34 +254,126 @@ variable "db_instance_global_tags" {
   default     = {}
 }
 
-variable "db_instance_monitoring_interval" {
-  description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance."
+#####
+# RDS instance
+#####
+
+variable "rds_instance_instance_classes" {
+  description = "List of instance classes to use."
+  type        = list(string)
+  default     = []
+}
+
+variable "rds_instance_availability_zones" {
+  description = "List of the EC2 Availability Zone that each DB instance are created in."
+  type        = list(string)
+  default     = []
+}
+
+variable "rds_instance_promotion_tiers" {
+  description = "List of number for failover Priority setting on instance level"
+  type        = list(number)
+  default     = null
+}
+
+#####
+# DB instance
+#####
+
+variable "db_instance_instance_class" {
+  description = "Instance classes to use."
+  type        = string
+  default     = null
+}
+
+variable "db_instance_availability_zone" {
+  description = "Availability zone for the instance. "
+  type        = string
+  default     = null
+}
+
+variable "db_instance_allocated_storage" {
+  description = "The allocated storage in gibibytes."
   type        = number
   default     = null
 }
 
-variable "db_instance_monitoring_role_arn" {
-  description = "The ARN for the IAM role that permits RDS to send enhanced monitoring metrics to CloudWatch Logs."
-  type        = string
-  default     = null
-}
-
-variable "db_instance_performance_insights_enabled" {
-  description = "Specifies whether Performance Insights is enabled or not."
+variable "db_instance_allow_major_version_upgrade" {
+  description = "Indicates that major version upgrades are allowed."
   type        = bool
   default     = false
 }
 
-variable "db_instance_performance_insights_kms_key_id" {
-  description = "The ARN for the KMS key to encrypt Performance Insights data."
+variable "db_instance_character_set_name" {
+  description = "The character set name to use for DB encoding in Oracle instances."
   type        = string
   default     = null
 }
 
-variable "db_instance_publicly_accessible" {
-  description = "Bool to control if instance is publicly accessible."
+variable "db_instance_delete_automated_backups" {
+  description = "Specifies whether to remove automated backups immediately after the DB instance is deleted."
+  type        = bool
+  default     = true
+}
+
+variable "db_instance_domain" {
+  description = "The ID of the Directory Service Active Directory domain to create the instance in."
+  type        = string
+  default     = null
+}
+
+variable "db_instance_domain_iam_role_name" {
+  description = "The name of the IAM role to be used when making API calls to the Directory Service."
+  type        = string
+  default     = null
+}
+
+variable "db_instance_iops" {
+  description = "The amount of provisioned IOPS. Setting this implies a storage_type of \"io1\"."
+  type        = number
+  default     = null
+}
+
+variable "db_instance_license_model" {
+  description = "License model information for this DB instance."
+  type        = string
+  default     = null
+}
+
+variable "db_instance_max_allocated_storage" {
+  description = "When configured, the upper limit to which Amazon RDS can automatically scale the storage of the DB instance."
+  type        = number
+  default     = null
+}
+
+variable "db_instance_multi_az" {
+  description = "Specifies if the RDS instance is multi-AZ"
   type        = bool
   default     = false
+}
+
+variable "db_instance_storage_type" {
+  description = "One of \"standard\" (magnetic), \"gp2\" (general purpose SSD), or \"io1\" (provisioned IOPS SSD)."
+  type        = string
+  default     = null
+}
+
+variable "db_instance_timezone" {
+  description = "Time zone of the DB instance. timezone is currently only supported by Microsoft SQL Server."
+  type        = string
+  default     = null
+}
+
+variable "db_instance_performance_insights_retention_period" {
+  description = "The amount of time in days to retain Performance Insights data"
+  type        = number
+  default     = null
+}
+
+variable "db_instance_replicate_source_db" {
+  description = "Specifies that this resource is a Replicate database, and to use this value as the source database."
+  type        = string
+  default     = null
 }
 
 #####
@@ -233,63 +394,15 @@ variable "rds_cluster_enable_s3_import" {
 }
 
 variable "rds_cluster_enable_scaling_configuration" {
-  description = "Enable scaling configuration. Only valid when engine_mode is set to serverless."
+  description = "Enable scalling configuration. Only valid when engine_mode is set to serverless."
   type        = bool
   default     = false
-}
-
-variable "rds_cluster_iam_database_authentication_enabled" {
-  description = "Specifies whether or mappings of AWS Identity and Access Management (IAM) accounts to database accounts is enabled."
-  type        = bool
-  default     = false
-}
-
-variable "rds_cluster_iam_roles" {
-  description = "A List of ARNs for the IAM roles to associate to the RDS Cluster."
-  type        = list(string)
-  default     = []
 }
 
 variable "rds_cluster_enable_http_endpoint" {
   description = "Enable HTTP endpoint (data API). Only valid when engine_mode is set to serverless."
   type        = bool
   default     = false
-}
-
-variable "rds_cluster_enabled_cloudwatch_logs_exports" {
-  description = "List of log types to export to cloudwatch."
-  type        = list(string)
-  default     = []
-}
-
-variable "rds_cluster_s3_import_bucket_name" {
-  description = "The bucket name where your backup is stored."
-  type        = string
-  default     = null
-}
-
-variable "rds_cluster_s3_import_bucket_prefix" {
-  description = "Can be blank, but is the path to your backup"
-  type        = string
-  default     = null
-}
-
-variable "rds_cluster_s3_import_ingestion_role" {
-  description = "Role applied to load the data."
-  type        = string
-  default     = null
-}
-
-variable "rds_cluster_s3_import_source_engine" {
-  description = "Source engine for the backup "
-  type        = string
-  default     = null
-}
-
-variable "rds_cluster_s3_import_source_engine_version" {
-  description = "Version of the source engine used to make the backup"
-  type        = string
-  default     = null
 }
 
 variable "rds_cluster_scaling_configuration_auto_pause" {
@@ -328,26 +441,26 @@ variable "rds_cluster_replication_source_identifier" {
   default     = null
 }
 
-variable "rds_cluster_skip_final_snapshot" {
+variable "skip_final_snapshot" {
   description = "Determines whether a final DB snapshot is created before the DB cluster is deleted."
   type        = bool
   default     = true
 }
 
-variable "rds_cluster_snapshot_identifier" {
-  description = "The name of your final DB snapshot when this DB cluster is deleted."
+variable "rds_cluster_global_cluster_identifier" {
+  description = "The global cluster identifier."
   type        = string
   default     = null
+}
+
+variable "rds_cluster_iam_roles" {
+  description = "A List of ARNs for the IAM roles to associate to the RDS Cluster."
+  type        = list(string)
+  default     = []
 }
 
 variable "rds_cluster_source_region" {
-  description = "The source region for an encrypted replica DB cluster."
-  type        = string
-  default     = null
-}
-
-variable "rds_cluster_global_cluster_identifier" {
-  description = "The global cluster identifier."
+  description = "The source region for an encrypted replica DB."
   type        = string
   default     = null
 }
@@ -381,22 +494,22 @@ variable "db_subnet_group_subnet_ids" {
 }
 
 #####
-# DB cluster parameter group
+# DB parameter group
 #####
 
-variable "rds_cluster_parameter_group_family" {
-  description = "The family of the DB cluster parameter group"
+variable "parameter_group_family" {
+  description = "The family of the DB parameter group"
   type        = string
   default     = null
 }
 
-variable "rds_cluster_parameter_group_name" {
-  description = "The name of the DB cluster parameter group."
+variable "parameter_group_name" {
+  description = "The name of the DB parameter group."
   type        = string
   default     = null
 }
 
-variable "rds_cluster_parameter_group_parameters" {
+variable "parameter_group_parameters" {
   description = "List of map of parameter to add. apply_method can be immediate or pending-reboot."
   type = list(object({
     name         = string
@@ -406,8 +519,54 @@ variable "rds_cluster_parameter_group_parameters" {
   default = []
 }
 
-variable "rds_cluster_parameter_group_tags" {
+variable "parameter_group_tags" {
   description = "Tags to be added with parameter group"
+  type        = map(string)
+  default     = {}
+}
+
+#####
+# DB option group
+#####
+
+variable "option_group_name" {
+  description = "The name of the option group."
+  type        = string
+  default     = null
+}
+
+variable "option_group_engine_name" {
+  description = "Specifies the name of the engine that this option group should be associated with."
+  type        = string
+  default     = null
+}
+
+variable "option_group_major_engine_version" {
+  description = "Specifies the major version of the engine that this option group should be associated with. "
+  type        = string
+  default     = null
+}
+
+variable "option_group_options" {
+  description = <<-DOCUMENTATION
+A list of map of Options to apply. Map must support the following structure:
+  * option_name (required, string): The Name of the Option (e.g. MEMCACHED).
+  * port (optional, number): The Port number when connecting to the Option (e.g. 11211).
+  * version (optional, string): The version of the option (e.g. 13.1.0.0).
+  * db_security_group_memberships (optional, string): A list of DB Security Groups for which the option is enabled.
+  * vpc_security_group_memberships (optional, string): A list of VPC Security Groups for which the option is enabled.
+  * option_settings (required, list of map): A list of map of option settings to apply:
+    * name (required, string): The Name of the setting.
+    * value (required, string): The Value of the setting.
+
+For example, see folder examples/db_instance_with_option_group.
+DOCUMENTATION
+  type        = any
+  default     = []
+}
+
+variable "option_group_tags" {
+  description = "Tags to be merge with the DB option group resource."
   type        = map(string)
   default     = {}
 }
