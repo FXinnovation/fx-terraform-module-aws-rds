@@ -60,10 +60,11 @@ module "kms_key" {
   # KMS key
   #####
 
-  use_default_kms_key = false
-  kms_key_alias_name  = "tftest"
-  kms_key_create      = true
-  kms_key_name        = "tftest"
+  use_default_kms_key  = false
+  kms_key_alias_name   = "tftest"
+  kms_key_create       = true
+  kms_key_create_alias = true
+  kms_key_name         = "tftest"
   kms_key_tags = {
     kmskeytag = "foo"
   }

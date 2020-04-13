@@ -144,7 +144,7 @@ variable "tags" {
 #####
 
 variable "db_instance_ca_cert_identifier" {
-  description = "he daily time range during which automated backups are created if automated backups are enabled using the BackupRetentionPeriod parameter.Time in UTC"
+  description = "The daily time range during which automated backups are created if automated backups are enabled using the BackupRetentionPeriod parameter.Time in UTC"
   type        = string
   default     = null
 }
@@ -424,6 +424,12 @@ variable "kms_key_alias_name" {
 
 variable "kms_key_create" {
   description = "Create a kms key for database"
+  type        = bool
+  default     = false
+}
+
+variable "kms_key_create_alias" {
+  description = "Create a kms key alias for database"
   type        = bool
   default     = false
 }

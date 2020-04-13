@@ -57,7 +57,7 @@ resource "aws_kms_key" "this" {
 }
 
 resource "aws_kms_alias" "this" {
-  count = var.enable && var.kms_key_create ? 1 : 0
+  count = var.enable && var.kms_key_create && var.kms_key_create_alias ? 1 : 0
 
   name          = var.use_num_suffix ? format("alias/%s%s-%0${var.num_suffix_digits}d", var.prefix, var.kms_key_alias_name, count.index + 1) : format("alias/%s%s", var.prefix, var.kms_key_alias_name)
   target_key_id = element(concat(aws_kms_key.this.*.key_id, [""]), 0)

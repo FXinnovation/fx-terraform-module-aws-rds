@@ -16,12 +16,13 @@ error deleting RDS Cluster (nsu6suhxtftest-00001): InvalidDBClusterStateFault: T
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12 |
+| aws | ~>2.57.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | n/a |
+| aws | ~>2.57.0 |
 
 ## Inputs
 
@@ -36,7 +37,7 @@ error deleting RDS Cluster (nsu6suhxtftest-00001): InvalidDBClusterStateFault: T
 | database\_identifier | The database identifier | `string` | `""` | no |
 | database\_name | Name for an automatically created database on cluster creation. | `string` | `null` | no |
 | db\_instance\_availability\_zones | List of the EC2 Availability Zone that each DB instance are created in. | `list(string)` | `[]` | no |
-| db\_instance\_ca\_cert\_identifier | he daily time range during which automated backups are created if automated backups are enabled using the BackupRetentionPeriod parameter.Time in UTC | `string` | `null` | no |
+| db\_instance\_ca\_cert\_identifier | The daily time range during which automated backups are created if automated backups are enabled using the BackupRetentionPeriod parameter.Time in UTC | `string` | `null` | no |
 | db\_instance\_global\_tags | Tags to be merge to all db instances | `map(string)` | `{}` | no |
 | db\_instance\_instance\_classes | List of instance classes to use. | `list(string)` | `[]` | no |
 | db\_instance\_monitoring\_interval | The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. | `number` | `null` | no |
@@ -57,6 +58,7 @@ error deleting RDS Cluster (nsu6suhxtftest-00001): InvalidDBClusterStateFault: T
 | final\_snapshot\_identifier | The name of your final DB snapshot when this DB cluster is deleted. | `string` | `null` | no |
 | kms\_key\_alias\_name | Alias of the KMS key | `string` | `null` | no |
 | kms\_key\_create | Create a kms key for database | `bool` | `false` | no |
+| kms\_key\_create\_alias | Create a kms key alias for database | `bool` | `false` | no |
 | kms\_key\_id | ID of KMS key used for database encryption. | `string` | `null` | no |
 | kms\_key\_name | Name of the KMS | `string` | `null` | no |
 | kms\_key\_policy\_json | Policy of the KMS Key | `string` | `null` | no |
