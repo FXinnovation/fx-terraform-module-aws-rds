@@ -1,6 +1,6 @@
 # RDS module with an external KMS, external subnet group ans external security group example
 
-Create an RDS cluster with an exeternal KMS key, external security group, and external security group. This also create a parameter group.
+Create an RDS cluster with an external KMS key, external security group, and external security group. This also create a parameter group.
 
 ## Usage
 

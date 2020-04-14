@@ -1,9 +1,10 @@
 locals {
   tags = {
-    provider = "terraform"
+    Provider  = "Terraform"
+    Terraform = "True"
   }
 
-  description = format("For %s %s", local.is_aurora ? "RDS cluster" : "DB instance", var.database_identifier)
+  description = var.description != null ? var.description : format("For %s %s", local.is_aurora ? "RDS cluster" : "DB instance", var.database_identifier)
 
   security_group_needed  = length(var.security_group_source_cidrs) > 0 || length(var.security_group_source_security_group) > 0
   db_subnet_group_needed = length(var.db_subnet_group_subnet_ids) > 0
@@ -26,12 +27,13 @@ resource "aws_db_subnet_group" "this" {
   name        = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.db_subnet_group_name, count.index + 1) : format("%s%s", var.prefix, var.db_subnet_group_name)
   description = local.description
   subnet_ids  = var.db_subnet_group_subnet_ids
-  tags = merge({
-    Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.db_subnet_group_name, count.index + 1) : format("%s%s", var.prefix, var.db_subnet_group_name)
+  tags = merge(
+    var.tags,
+    var.db_subnet_group_tags,
+    {
+      Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.db_subnet_group_name, count.index + 1) : format("%s%s", var.prefix, var.db_subnet_group_name)
     },
     local.tags,
-    var.db_subnet_group_tags,
-    var.tags,
   )
 }
 
@@ -47,12 +49,12 @@ resource "aws_kms_key" "this" {
   policy      = var.kms_key_policy_json
 
   tags = merge(
+    var.tags,
+    var.kms_key_tags,
     {
       "Name" = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.kms_key_name, count.index + 1) : format("%s%s", var.prefix, var.kms_key_name)
     },
     local.tags,
-    var.kms_key_tags,
-    var.tags,
   )
 }
 
@@ -138,12 +140,13 @@ resource "aws_rds_cluster" "this" {
 
   enable_http_endpoint = var.rds_cluster_enable_http_endpoint
 
-  tags = merge({
-    Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.rds_cluster_identifier, count.index + 1) : format("%s%s", var.prefix, var.rds_cluster_identifier)
+  tags = merge(
+    var.tags,
+    var.rds_cluster_tags,
+    {
+      Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.rds_cluster_identifier, count.index + 1) : format("%s%s", var.prefix, var.rds_cluster_identifier)
     },
     local.tags,
-    var.rds_cluster_tags,
-    var.tags,
   )
 }
 
@@ -170,13 +173,14 @@ resource "aws_rds_cluster_instance" "this" {
   performance_insights_kms_key_id = var.db_instance_performance_insights_kms_key_id
   copy_tags_to_snapshot           = var.copy_tags_to_snapshot
   ca_cert_identifier              = var.db_instance_ca_cert_identifier
-  tags = merge({
-    Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.database_identifier, (count.index + 1)) : format("%s%s", var.prefix, var.database_identifier)
-    },
-    length(var.db_instance_tags) > 0 ? var.db_instance_tags[count.index] : {},
-    local.tags,
-    var.db_instance_global_tags,
+  tags = merge(
     var.tags,
+    var.db_instance_global_tags,
+    length(var.db_instance_tags) > 0 ? var.db_instance_tags[count.index] : {},
+    {
+      Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.database_identifier, (count.index + 1)) : format("%s%s", var.prefix, var.database_identifier)
+    },
+    local.tags,
   )
 }
 
@@ -198,12 +202,13 @@ resource "aws_rds_cluster_parameter_group" "this" {
     }
   }
 
-  tags = merge({
-    Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.rds_cluster_parameter_group_name, count.index + 1) : format("%s%s", var.prefix, var.rds_cluster_parameter_group_name)
+  tags = merge(
+    var.tags,
+    var.rds_cluster_parameter_group_tags,
+    {
+      Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.rds_cluster_parameter_group_name, count.index + 1) : format("%s%s", var.prefix, var.rds_cluster_parameter_group_name)
     },
     local.tags,
-    var.rds_cluster_parameter_group_tags,
-    var.tags
   )
 }
 
@@ -217,12 +222,13 @@ resource "aws_security_group" "this" {
   name        = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.security_group_name, count.index + 1) : format("%s%s", var.prefix, var.security_group_name)
   description = local.description
   vpc_id      = var.security_group_vpc_id
-  tags = merge({
-    Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.security_group_name, count.index + 1) : format("%s%s", var.prefix, var.security_group_name)
+  tags = merge(
+    var.tags,
+    var.security_group_tags,
+    {
+      Name = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.security_group_name, count.index + 1) : format("%s%s", var.prefix, var.security_group_name)
     },
     local.tags,
-    var.secuirty_group_tags,
-    var.tags,
   )
 }
 

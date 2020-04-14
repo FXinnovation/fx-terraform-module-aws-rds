@@ -13,7 +13,7 @@ resource "random_string" "this" {
 
 }
 
-module "standard" {
+module "rds_cluster" {
   source = "../../"
 
   #####
@@ -85,7 +85,7 @@ module "standard" {
 
   security_group_name         = "tftest"
   security_group_source_cidrs = ["127.0.0.1/32", "10.0.0.0/8"]
-  secuirty_group_tags = {
+  security_group_tags = {
     dbsgtags = "tftest"
   }
   security_group_vpc_id = data.aws_vpc.default.id

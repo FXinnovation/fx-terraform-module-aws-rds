@@ -1,4 +1,4 @@
-# RDS cluster with kms key creation example
+# RDS cluster with KMS key creation example
 
 Create a RDS cluster with a KMS key.
 

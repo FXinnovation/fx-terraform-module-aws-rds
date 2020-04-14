@@ -63,7 +63,7 @@ variable "backtrack_window" {
 }
 
 variable "backup_retention_period" {
-  description = "The days to retain backups for. Default 1"
+  description = "The number of days to retain backups for. Default 1"
   type        = number
   default     = 1
 }
@@ -116,25 +116,31 @@ variable "port" {
 }
 
 variable "preferred_backup_window" {
-  description = "The daily time range during which automated backups are created if automated backups are enabled."
+  description = "The daily time range during which automated backups are created if automated backups are enabled. Time in UTC, e.g. 04:00-09:00"
   type        = string
   default     = null
 }
 
 variable "preferred_maintenance_window" {
-  description = "The window to perform maintenance in."
+  description = "The weekly window to perform maintenance in. Time in UTC  e.g. wed:04:00-wed:04:30"
   type        = string
   default     = null
 }
 
 variable "prefix" {
-  description = "Prefix to be added to all resources"
+  description = "Prefix to be added to all resources."
   type        = string
   default     = ""
 }
 
+variable "description" {
+  description = "Description to be added on security_group, rds_parameter_group, kms_key and db_subnet_group."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
-  description = "Tags to be merged with all resources of this module"
+  description = "Tags to be merged with all resources of this module."
   type        = map(string)
   default     = {}
 }
@@ -144,7 +150,7 @@ variable "tags" {
 #####
 
 variable "db_instance_ca_cert_identifier" {
-  description = "The daily time range during which automated backups are created if automated backups are enabled using the BackupRetentionPeriod parameter.Time in UTC"
+  description = "The identifier of the CA certificate for the DB instance."
   type        = string
   default     = null
 }
@@ -162,7 +168,7 @@ variable "db_instance_instance_classes" {
 }
 
 variable "db_instance_promotion_tiers" {
-  description = "List of number for failover Priority setting on instance level"
+  description = "List of number for failover Priority setting on instance level. This will be use for the master election, and, load balancing into the cluster."
   type        = list(number)
   default     = null
 }
@@ -227,7 +233,7 @@ variable "rds_cluster_enable_s3_import" {
 }
 
 variable "rds_cluster_enable_scaling_configuration" {
-  description = "Enable scalling configuration. Only valid when engine_mode is set to serverless."
+  description = "Enable scaling configuration. Only valid when engine_mode is set to serverless."
   type        = bool
   default     = false
 }
@@ -391,7 +397,7 @@ variable "rds_cluster_parameter_group_name" {
 }
 
 variable "rds_cluster_parameter_group_parameters" {
-  description = "List of map of parameter to add."
+  description = "List of map of parameter to add. apply_method can be immediate or pending-reboot."
   type = list(object({
     name         = string
     value        = string
@@ -411,7 +417,7 @@ variable "rds_cluster_parameter_group_tags" {
 #####
 
 variable "use_default_kms_key" {
-  description = "USe the default KMS key to encrypt DBs."
+  description = "Use the default KMS key to encrypt DBs."
   type        = bool
   default     = true
 }
@@ -441,7 +447,7 @@ variable "kms_key_id" {
 }
 
 variable "kms_key_name" {
-  description = "Name of the KMS"
+  description = "Name of the KMS if kms_key_create is set to true."
   type        = string
   default     = null
 }
@@ -480,14 +486,14 @@ variable "security_group_source_security_group" {
   default     = []
 }
 
-variable "secuirty_group_tags" {
-  description = "Tags to be merged to security group"
-  type        = map(string)
-  default     = {}
-}
-
 variable "security_group_vpc_id" {
   description = "ID of the VPC"
   type        = string
   default     = null
+}
+
+variable "security_group_tags" {
+  description = "Tags to be merged to the security group"
+  type        = map(string)
+  default     = {}
 }
