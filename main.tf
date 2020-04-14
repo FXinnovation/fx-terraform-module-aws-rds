@@ -1,7 +1,7 @@
 locals {
   tags = {
-    Provider  = "Terraform"
-    Terraform = "True"
+    managed-by = "terraform"
+    Terraform  = "True"
   }
 
   description = var.description != null ? var.description : format("For %s %s", local.is_aurora ? "RDS cluster" : "DB instance", var.database_identifier)
@@ -15,6 +15,31 @@ locals {
   #####
 
   rds_cluster_parameter_group_needed = local.is_aurora && length(var.rds_cluster_parameter_group_parameters) > 0
+}
+
+resource "random_id" "final_snapshot" {
+  count = var.enable && var.final_snapshot_identifier_prefix != null ? 1 : 0
+
+  // To create this list, please select all parameters with the flag ForceNew on this page :
+  // https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_rds_cluster.go
+  keepers = {
+    cluster_identifier    = var.rds_cluster_identifier
+    database_name         = var.database_name
+    db_subnet_group_name  = local.db_subnet_group_needed ? element(concat(aws_db_subnet_group.this.*.name, [""]), 0) : var.db_subnet_group_name
+    engine                = var.engine
+    engine_mode           = var.engine_mode
+    bucket_name           = var.rds_cluster_s3_import_bucket_name
+    bucket_prefix         = var.rds_cluster_s3_import_bucket_prefix
+    ingestion_role        = var.rds_cluster_s3_import_ingestion_role
+    source_engine         = var.rds_cluster_s3_import_source_engine
+    source_engine_version = var.rds_cluster_s3_import_source_engine_version
+    master_username       = var.master_username
+    port                  = var.port
+    kms_key_id            = var.kms_key_create ? element(concat(aws_kms_key.this.*.arn, [""]), 0) : var.use_default_kms_key ? var.kms_key_id : null
+    source_region         = var.rds_cluster_source_region
+  }
+
+  byte_length = 5
 }
 
 #####
@@ -88,7 +113,7 @@ resource "aws_rds_cluster" "this" {
 
   deletion_protection       = var.deletion_protection
   skip_final_snapshot       = var.rds_cluster_skip_final_snapshot
-  final_snapshot_identifier = var.final_snapshot_identifier
+  final_snapshot_identifier = var.final_snapshot_identifier_prefix != null ? format("%s%s-%s", var.prefix, var.final_snapshot_identifier_prefix, element(concat(random_id.final_snapshot.*.dec, [""]), 0)) : null
 
   snapshot_identifier = var.rds_cluster_snapshot_identifier
 

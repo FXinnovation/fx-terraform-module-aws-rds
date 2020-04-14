@@ -26,8 +26,8 @@ variable "engine_version" {
   default     = null
 }
 
-variable "final_snapshot_identifier" {
-  description = "The name of your final DB snapshot when this DB cluster is deleted."
+variable "final_snapshot_identifier_prefix" {
+  description = "The prefix name of your final DB snapshot when this DB cluster is deleted. This will be suffixed by a 5 digits random id managed by terraform."
   type        = string
   default     = null
 }

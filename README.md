@@ -25,6 +25,7 @@ No KMS key created internall for performance insights. Must be given externally.
 | Name | Version |
 |------|---------|
 | aws | ~>2.57.0 |
+| random | n/a |
 
 ## Inputs
 
@@ -58,7 +59,7 @@ No KMS key created internall for performance insights. Must be given externally.
 | engine | The name of the database engine to be used for this DB | `string` | `null` | no |
 | engine\_mode | The database engine mode. | `string` | `null` | no |
 | engine\_version | The database engine version. | `string` | `null` | no |
-| final\_snapshot\_identifier | The name of your final DB snapshot when this DB cluster is deleted. | `string` | `null` | no |
+| final\_snapshot\_identifier\_prefix | The prefix name of your final DB snapshot when this DB cluster is deleted. This will be suffixed by a 5 digits random id managed by terraform. | `string` | `null` | no |
 | kms\_key\_alias\_name | Alias of the KMS key | `string` | `null` | no |
 | kms\_key\_create | Create a kms key for database | `bool` | `false` | no |
 | kms\_key\_create\_alias | Create a kms key alias for database | `bool` | `false` | no |
