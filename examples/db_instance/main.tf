@@ -74,4 +74,24 @@ module "db_instance" {
     dbsgtags = "tftest"
   }
   security_group_vpc_id = data.aws_vpc.default.id
+
+  #####
+  # SSM parameters
+  #####
+
+  create_ssm_parameters = true
+
+  ssm_parameters_use_database_kms_key = true
+
+  ssm_parameters_prefix = random_string.this.result
+
+  ssm_parameters_endpoint_key_name = "endpointURL"
+
+  ssm_parameters_iam_policy_create                 = true
+  ssm_parameters_iam_policy_name_prefix_read_only  = "tftestRO"
+  ssm_parameters_iam_policy_name_prefix_read_write = "tftestRW"
+
+  ssm_parameters_tags = {
+    ssmTags = "foo"
+  }
 }

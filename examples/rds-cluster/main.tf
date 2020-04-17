@@ -89,4 +89,12 @@ module "rds_cluster" {
     dbsgtags = "tftest"
   }
   security_group_vpc_id = data.aws_vpc.default.id
+
+  #####
+  # SSM parameters
+  #####
+
+  create_ssm_parameters               = true
+  ssm_parameters_use_database_kms_key = true
+  ssm_parameters_prefix               = random_string.this.result
 }

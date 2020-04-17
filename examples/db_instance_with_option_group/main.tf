@@ -10,7 +10,6 @@ resource "random_string" "this" {
   upper   = false
   special = false
   number  = false
-
 }
 
 resource "aws_security_group" "example" {
@@ -114,4 +113,21 @@ module "db_instance_with_option_group" {
       ]
     }
   ]
+
+  #####
+  # SSM parameters
+  #####
+
+  create_ssm_parameters = true
+
+  ssm_parameters_prefix = random_string.this.result
+
+  ssm_parameters_export_master_password    = false
+  ssm_parameters_export_database_name      = false
+  ssm_parameters_export_character_set_name = false
+  ssm_parameters_export_endpoint_reader    = false
+
+  ssm_parameters_kms_key_create     = true
+  ssm_parameters_kms_key_name       = "tftest-ssm"
+  ssm_parameters_kms_key_alias_name = "tftest-ssm"
 }

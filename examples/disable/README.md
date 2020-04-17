@@ -8,7 +8,6 @@ To run this example, you need to execute:
 
 ```
 $ terraform init
-$ terraform plan
 $ terraform apply
 ```
 
@@ -19,6 +18,7 @@ $ terraform apply
 |------|---------|
 | terraform | >= 0.12 |
 | aws | ~> 2 |
+| aws | ~>2.57 |
 
 ## Providers
 
@@ -92,5 +92,25 @@ No provider.
 | security\_group\_name | n/a |
 | security\_group\_owner\_id | n/a |
 | security\_group\_vpc\_id | n/a |
+| ssm\_parameters\_arns | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_arn | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_description | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_id | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_name | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_path | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_policy | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_arn | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_description | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_id | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_name | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_path | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_policy | n/a |
+| ssm\_parameters\_kms\_alias\_arn | n/a |
+| ssm\_parameters\_kms\_alias\_target\_key\_arn | n/a |
+| ssm\_parameters\_kms\_key\_arn | n/a |
+| ssm\_parameters\_kms\_key\_id | n/a |
+| ssm\_parameters\_names | n/a |
+| ssm\_parameters\_types | n/a |
+| ssm\_parameters\_versions | n/a |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

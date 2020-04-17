@@ -225,3 +225,87 @@ output "security_group_ingress" {
 output "security_group_egress" {
   value = element(concat(aws_security_group.this.*.egress, [""]), 0)
 }
+
+#####
+# SSM parameters
+#####
+
+output "ssm_parameters_arns" {
+  value = module.ssm.arns
+}
+
+output "ssm_parameters_names" {
+  value = module.ssm.names
+}
+
+output "ssm_parameters_types" {
+  value = module.ssm.types
+}
+
+output "ssm_parameters_versions" {
+  value = module.ssm.versions
+}
+
+output "ssm_parameters_kms_key_arn" {
+  value = module.ssm.kms_key_arn
+}
+
+output "ssm_parameters_kms_key_id" {
+  value = module.ssm.kms_key_id
+}
+
+output "ssm_parameters_kms_alias_arn" {
+  value = module.ssm.kms_alias_arn
+}
+
+output "ssm_parameters_kms_alias_target_key_arn" {
+  value = module.ssm.kms_alias_target_key_arn
+}
+
+output "ssm_parameters_iam_policy_read_only_id" {
+  value = module.ssm.iam_policy_read_only_id
+}
+
+output "ssm_parameters_iam_policy_read_only_arn" {
+  value = module.ssm.iam_policy_read_only_arn
+}
+
+output "ssm_parameters_iam_policy_read_only_description" {
+  value = module.ssm.iam_policy_read_only_description
+}
+
+output "ssm_parameters_iam_policy_read_only_name" {
+  value = module.ssm.iam_policy_read_only_name
+}
+
+output "ssm_parameters_iam_policy_read_only_path" {
+  value = module.ssm.iam_policy_read_only_path
+}
+
+output "ssm_parameters_iam_policy_read_only_policy" {
+  value = module.ssm.iam_policy_read_only_policy
+}
+
+output "ssm_parameters_iam_policy_read_write_id" {
+  value = module.ssm.iam_policy_read_write_id
+}
+
+output "ssm_parameters_iam_policy_read_write_arn" {
+  value = module.ssm.iam_policy_read_write_arn
+}
+
+output "ssm_parameters_iam_policy_read_write_description" {
+  value = module.ssm.iam_policy_read_write_description
+}
+
+output "ssm_parameters_iam_policy_read_write_name" {
+  value = module.ssm.iam_policy_read_write_name
+}
+
+output "ssm_parameters_iam_policy_read_write_path" {
+  value = module.ssm.iam_policy_read_write_path
+}
+
+output "ssm_parameters_iam_policy_read_write_policy" {
+  value = module.ssm.iam_policy_read_write_policy
+}

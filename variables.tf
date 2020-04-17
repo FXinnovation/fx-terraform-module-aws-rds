@@ -140,7 +140,7 @@ variable "preferred_maintenance_window" {
 }
 
 variable "prefix" {
-  description = "Prefix to be added to all resources."
+  description = "Prefix to be added to all resources, execpt SSM paramter keys. To prefix SSM parameter keys, see `ssm_parameters_prefix`."
   type        = string
   default     = ""
 }
@@ -547,7 +547,6 @@ variable "option_group_major_engine_version" {
   default     = null
 }
 
-<<<<<<< HEAD
 variable "option_group_options" {
   description = <<-DOCUMENTATION
 A list of map of Options to apply. Map must support the following structure:
@@ -564,46 +563,6 @@ For example, see folder examples/db_instance_with_option_group.
 DOCUMENTATION
   type        = any
   default     = []
-}
-
-=======
-variable "option_group_option_names" {
-  description = "List of option name, e.g. MEMCACHED"
-  type        = list(string)
-  default     = []
-}
-
-variable "option_group_option_ports" {
-  description = "List of port use when connecting to the option"
-  type        = list(number)
-  default     = []
-}
-
-variable "option_group_option_versions" {
-  description = "List of option version e.g 1.3.1.0.0"
-  type        = list(string)
-  default     = []
-}
-
-variable "option_group_option_db_security_group_memberships" {
-  description = "List of list of DB Security Groups for which the option is enabled."
-  type        = list(list(string))
-  default     = [[]]
-}
-
-variable "option_group_option_vpc_security_group_memberships" {
-  description = "List of list of VPC Security Groups for which the option is enabled."
-  type        = list(list(string))
-  default     = [[]]
-}
-
-variable "option_group_option_settings" {
-  description = "list of list of maps of option settings"
-  type = list(list(object({
-    name  = string,
-    value = string,
-  })))
-  default = [[]]
 }
 
 variable "option_group_tags" {
@@ -694,6 +653,220 @@ variable "security_group_vpc_id" {
 
 variable "security_group_tags" {
   description = "Tags to be merged to the security group"
+  type        = map(string)
+  default     = {}
+}
+
+#####
+# SSM parameters
+#####
+
+variable "create_ssm_parameters" {
+  description = "Create SMM parameters related to database informations"
+  type        = bool
+  default     = false
+}
+
+variable "ssm_parameters_use_database_kms_key" {
+  description = "Use the same KMS key as for the database"
+  type        = bool
+  default     = false
+}
+
+variable "ssm_parameters_use_default_kms_key" {
+  description = "Use default AWS KMS key"
+  type        = bool
+  default     = false
+}
+
+variable "ssm_parameters_kms_key_id" {
+  description = "ID of the kms key if toggle ssm_parameters_kms_key_create, ssm_parameters_use_database_kms_key or ssm_parameters_use_default_kms_key are disable."
+  type        = bool
+  default     = false
+}
+
+variable "ssm_parameters_prefix" {
+  description = "Prefix to be add on all SSM parameter keys. Cannot started by «/»."
+  type        = string
+  default     = ""
+}
+
+variable "ssm_parameters_export_endpoint" {
+  description = "Export the endpoint name in a SSM parameter."
+  type        = bool
+  default     = true
+}
+
+variable "ssm_parameters_endpoint_key_name" {
+  description = "Name of the endpoint SSM parameter key."
+  type        = string
+  default     = "endpoint"
+}
+
+variable "ssm_parameters_endpoint_description" {
+  description = "Description of the endpoint SSM parameter."
+  type        = string
+  default     = "DNS address of the database"
+}
+
+variable "ssm_parameters_export_port" {
+  description = "Export the database port in a SSM parameter."
+  type        = bool
+  default     = true
+}
+
+variable "ssm_parameters_port_key_name" {
+  description = "Name of the database port SSM parameter key."
+  type        = string
+  default     = "databasePort"
+}
+
+variable "ssm_parameters_port_description" {
+  description = "Description of the database port SSM parameter."
+  type        = string
+  default     = "Port of the database"
+}
+
+variable "ssm_parameters_export_master_username" {
+  description = "Export the master username in a secure SSM parameter."
+  type        = bool
+  default     = true
+}
+
+variable "ssm_parameters_master_username_key_name" {
+  description = "Name of the master username SSM parameter key."
+  type        = string
+  default     = "masterUsername"
+}
+
+variable "ssm_parameters_master_username_description" {
+  description = "Description of the master username SSM parameter."
+  type        = string
+  default     = "Master username of the database"
+}
+
+variable "ssm_parameters_export_master_password" {
+  description = "Export the master password in a secure SSM parameter."
+  type        = bool
+  default     = true
+}
+
+variable "ssm_parameters_master_pasword_key_name" {
+  description = "Name of the master passsword SSM parameter key."
+  type        = string
+  default     = "masterPassword"
+}
+
+variable "ssm_parameters_master_pasword_description" {
+  description = "Description of the master passsword SSM parameter."
+  type        = string
+  default     = "Master password of the database"
+}
+
+variable "ssm_parameters_export_database_name" {
+  description = "Export the database name in a SSM parameter. If no database name are provisioned, SSM parameter value will be «N/A»"
+  type        = bool
+  default     = true
+}
+
+variable "ssm_parameters_database_name_key_name" {
+  description = "Name of the database name SSM parameter key."
+  type        = string
+  default     = "databaseName"
+}
+
+variable "ssm_parameters_database_name_description" {
+  description = "Description of the database name SSM parameter."
+  type        = string
+  default     = "Database name created by AWS"
+}
+
+variable "ssm_parameters_export_character_set_name" {
+  description = "Export the character set namein a SSM parameter. If no character set name are provisioned, SSM parameter value will be «N/A»"
+  type        = bool
+  default     = true
+}
+
+variable "ssm_parameters_character_set_name_key_name" {
+  description = "Name of the character set name SSM parameter key."
+  type        = string
+  default     = "characterSetName"
+}
+
+variable "ssm_parameters_character_set_name_description" {
+  description = "Description of the character set name SSM parameter."
+  type        = string
+  default     = "Character set name of the database"
+}
+
+variable "ssm_parameters_export_endpoint_reader" {
+  description = "Export the endpoint reader name in a SSM parameter. If provisioned engine isn't aurora, SSM parameter value will be «N/A»"
+  type        = bool
+  default     = true
+}
+
+variable "ssm_parameters_endpoint_reader_key_name" {
+  description = "Name of the endpoint reader SSM parameter key."
+  type        = string
+  default     = "endpointReader"
+}
+
+variable "ssm_parameters_endpoint_reader_description" {
+  description = "Description of the endpoint reader SSM parameter."
+  type        = string
+  default     = "DNS address of the read only RDS cluser"
+}
+
+variable "ssm_parameters_kms_key_create" {
+  description = "Create KMS key for SSM parameters."
+  type        = bool
+  default     = false
+}
+
+variable "ssm_parameters_kms_key_name" {
+  description = "Name of the KMS key."
+  type        = string
+  default     = ""
+}
+
+variable "ssm_parameters_kms_key_alias_name" {
+  description = "Name of the alias KMS key."
+  type        = string
+  default     = ""
+}
+
+variable "ssm_parameters_iam_policy_create" {
+  description = "Create iam policy for SSM parameters and KMS key access."
+  type        = bool
+  default     = false
+}
+
+variable "ssm_parameters_iam_policy_path" {
+  description = "Path of the SSM parameters IAM policies."
+  type        = string
+  default     = null
+}
+
+variable "ssm_parameters_iam_policy_name_prefix_read_only" {
+  description = "Name of the SSM parameters IAM read only policy."
+  type        = string
+  default     = ""
+}
+
+variable "ssm_parameters_iam_policy_name_prefix_read_write" {
+  description = "Name of the SSM parameters IAM read write policy."
+  type        = string
+  default     = ""
+}
+
+variable "ssm_parameters_kms_key_tags" {
+  description = "Tags to be merge with all SSM parameters KMS key resources."
+  type        = map(string)
+  default     = {}
+}
+
+variable "ssm_parameters_tags" {
+  description = "Tags to be merge with all SSM parameters resources."
   type        = map(string)
   default     = {}
 }

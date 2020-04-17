@@ -2,6 +2,15 @@
 
 Terraform module that helps you create a RDS instance.
 
+This module can create :
+  * 1 RDS cluster with n RDS cluster endpoint OR 1 RDS db instance (dynamicly choosen depending the engine)
+  * 1 option group (if not RDS cluster)
+  * 1 parameter group / cluster parameter group (dynamicly choosen depending the engine)
+  * 1 subnet group
+  * 1 KMS key
+  * 1 security group that allow security groups and/or cidr range to access to the database
+  * Export RDS endpoint, RDS reader endpoint, RDS port, master username, master password, database name and character set name on SSM parameters. Master username and master password are stored as SecureString, encrypted by a KMS key.
+
 ## Limitations:
 
  * This module doesn't support RDS global cluster creation. There is an issue with deletion :
@@ -18,13 +27,13 @@ Terraform module that helps you create a RDS instance.
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12 |
-| aws | ~>2.57.0 |
+| aws | ~>2.57 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | ~>2.57.0 |
+| aws | ~>2.57 |
 | random | n/a |
 
 ## Inputs
@@ -39,6 +48,7 @@ Terraform module that helps you create a RDS instance.
 | ca\_cert\_identifier | he daily time range during which automated backups are created if automated backups are enabled using the BackupRetentionPeriod parameter.Time in UTC | `string` | `null` | no |
 | cloudwatch\_logs\_exports | List of log types to export to cloudwatch. | `list(string)` | `[]` | no |
 | copy\_tags\_to\_snapshot | Copy all Cluster tags to snapshots. Default is false. | `bool` | `false` | no |
+| create\_ssm\_parameters | Create SMM parameters related to database informations | `bool` | `false` | no |
 | database\_identifier | The database identifier | `string` | `""` | no |
 | database\_name | Name for an automatically created database on cluster creation. | `string` | `null` | no |
 | db\_instance\_allocated\_storage | The allocated storage in gibibytes. | `number` | `null` | no |
@@ -87,16 +97,7 @@ Terraform module that helps you create a RDS instance.
 | option\_group\_engine\_name | Specifies the name of the engine that this option group should be associated with. | `string` | `null` | no |
 | option\_group\_major\_engine\_version | Specifies the major version of the engine that this option group should be associated with. | `string` | `null` | no |
 | option\_group\_name | The name of the option group. | `string` | `null` | no |
-<<<<<<< HEAD
 | option\_group\_options | A list of map of Options to apply. Map must support the following structure:<br>  * option\_name (required, string): The Name of the Option (e.g. MEMCACHED).<br>  * port (optional, number): The Port number when connecting to the Option (e.g. 11211).<br>  * version (optional, string): The version of the option (e.g. 13.1.0.0).<br>  * db\_security\_group\_memberships (optional, string): A list of DB Security Groups for which the option is enabled.<br>  * vpc\_security\_group\_memberships (optional, string): A list of VPC Security Groups for which the option is enabled.<br>  * option\_settings (required, list of map): A list of map of option settings to apply:<br>    * name (required, string): The Name of the setting.<br>    * value (required, string): The Value of the setting.<br><br>For example, see folder examples/db\_instance\_with\_option\_group. | `any` | `[]` | no |
-=======
-| option\_group\_option\_db\_security\_group\_memberships | List of list of DB Security Groups for which the option is enabled. | `list(list(string))` | <pre>[<br>  []<br>]</pre> | no |
-| option\_group\_option\_names | List of option name, e.g. MEMCACHED | `list(string)` | `[]` | no |
-| option\_group\_option\_ports | List of port use when connecting to the option | `list(number)` | `[]` | no |
-| option\_group\_option\_settings | list of list of maps of option settings | <pre>list(list(object({<br>    name  = string,<br>    value = string,<br>  })))</pre> | <pre>[<br>  []<br>]</pre> | no |
-| option\_group\_option\_versions | List of option version e.g 1.3.1.0.0 | `list(string)` | `[]` | no |
-| option\_group\_option\_vpc\_security\_group\_memberships | List of list of VPC Security Groups for which the option is enabled. | `list(list(string))` | <pre>[<br>  []<br>]</pre> | no |
->>>>>>> 48c2392... feature/ add db_instance and aws_db_option_group
 | option\_group\_tags | Tags to be merge with the DB option group resource. | `map(string)` | `{}` | no |
 | parameter\_group\_family | The family of the DB parameter group | `string` | `null` | no |
 | parameter\_group\_name | The name of the DB parameter group. | `string` | `null` | no |
@@ -107,7 +108,7 @@ Terraform module that helps you create a RDS instance.
 | port | The database port | `number` | `null` | no |
 | preferred\_backup\_window | The daily time range during which automated backups are created if automated backups are enabled. Time in UTC, e.g. 04:00-09:00 | `string` | `null` | no |
 | preferred\_maintenance\_window | The weekly window to perform maintenance in. Time in UTC  e.g. wed:04:00-wed:04:30 | `string` | `null` | no |
-| prefix | Prefix to be added to all resources. | `string` | `""` | no |
+| prefix | Prefix to be added to all resources, execpt SSM paramter keys. To prefix SSM parameter keys, see `ssm_parameters_prefix`. | `string` | `""` | no |
 | publicly\_accessible | Bool to control if instance is publicly accessible. | `bool` | `false` | no |
 | rds\_cluster\_enable\_http\_endpoint | Enable HTTP endpoint (data API). Only valid when engine\_mode is set to serverless. | `bool` | `false` | no |
 | rds\_cluster\_enable\_s3\_import | Enable S3 import on RDS database creation | `bool` | `false` | no |
@@ -138,6 +139,40 @@ Terraform module that helps you create a RDS instance.
 | security\_group\_vpc\_id | ID of the VPC | `string` | `null` | no |
 | skip\_final\_snapshot | Determines whether a final DB snapshot is created before the DB cluster is deleted. | `bool` | `true` | no |
 | snapshot\_identifier | The name of your final DB snapshot when this DB cluster is deleted. | `string` | `null` | no |
+| ssm\_parameters\_character\_set\_name\_description | Description of the character set name SSM parameter. | `string` | `"Character set name of the database"` | no |
+| ssm\_parameters\_character\_set\_name\_key\_name | Name of the character set name SSM parameter key. | `string` | `"characterSetName"` | no |
+| ssm\_parameters\_database\_name\_description | Description of the database name SSM parameter. | `string` | `"Database name created by AWS"` | no |
+| ssm\_parameters\_database\_name\_key\_name | Name of the database name SSM parameter key. | `string` | `"databaseName"` | no |
+| ssm\_parameters\_endpoint\_description | Description of the endpoint SSM parameter. | `string` | `"DNS address of the database"` | no |
+| ssm\_parameters\_endpoint\_key\_name | Name of the endpoint SSM parameter key. | `string` | `"endpoint"` | no |
+| ssm\_parameters\_endpoint\_reader\_description | Description of the endpoint reader SSM parameter. | `string` | `"DNS address of the read only RDS cluser"` | no |
+| ssm\_parameters\_endpoint\_reader\_key\_name | Name of the endpoint reader SSM parameter key. | `string` | `"endpointReader"` | no |
+| ssm\_parameters\_export\_character\_set\_name | Export the character set namein a SSM parameter. If no character set name are provisioned, SSM parameter value will be «N/A» | `bool` | `true` | no |
+| ssm\_parameters\_export\_database\_name | Export the database name in a SSM parameter. If no database name are provisioned, SSM parameter value will be «N/A» | `bool` | `true` | no |
+| ssm\_parameters\_export\_endpoint | Export the endpoint name in a SSM parameter. | `bool` | `true` | no |
+| ssm\_parameters\_export\_endpoint\_reader | Export the endpoint reader name in a SSM parameter. If provisioned engine isn't aurora, SSM parameter value will be «N/A» | `bool` | `true` | no |
+| ssm\_parameters\_export\_master\_password | Export the master password in a secure SSM parameter. | `bool` | `true` | no |
+| ssm\_parameters\_export\_master\_username | Export the master username in a secure SSM parameter. | `bool` | `true` | no |
+| ssm\_parameters\_export\_port | Export the database port in a SSM parameter. | `bool` | `true` | no |
+| ssm\_parameters\_iam\_policy\_create | Create iam policy for SSM parameters and KMS key access. | `bool` | `false` | no |
+| ssm\_parameters\_iam\_policy\_name\_prefix\_read\_only | Name of the SSM parameters IAM read only policy. | `string` | `""` | no |
+| ssm\_parameters\_iam\_policy\_name\_prefix\_read\_write | Name of the SSM parameters IAM read write policy. | `string` | `""` | no |
+| ssm\_parameters\_iam\_policy\_path | Path of the SSM parameters IAM policies. | `string` | `null` | no |
+| ssm\_parameters\_kms\_key\_alias\_name | Name of the alias KMS key. | `string` | `""` | no |
+| ssm\_parameters\_kms\_key\_create | Create KMS key for SSM parameters. | `bool` | `false` | no |
+| ssm\_parameters\_kms\_key\_id | ID of the kms key if toggle ssm\_parameters\_kms\_key\_create, ssm\_parameters\_use\_database\_kms\_key or ssm\_parameters\_use\_default\_kms\_key are disable. | `bool` | `false` | no |
+| ssm\_parameters\_kms\_key\_name | Name of the KMS key. | `string` | `""` | no |
+| ssm\_parameters\_kms\_key\_tags | Tags to be merge with all SSM parameters KMS key resources. | `map(string)` | `{}` | no |
+| ssm\_parameters\_master\_pasword\_description | Description of the master passsword SSM parameter. | `string` | `"Master password of the database"` | no |
+| ssm\_parameters\_master\_pasword\_key\_name | Name of the master passsword SSM parameter key. | `string` | `"masterPassword"` | no |
+| ssm\_parameters\_master\_username\_description | Description of the master username SSM parameter. | `string` | `"Master username of the database"` | no |
+| ssm\_parameters\_master\_username\_key\_name | Name of the master username SSM parameter key. | `string` | `"masterUsername"` | no |
+| ssm\_parameters\_port\_description | Description of the database port SSM parameter. | `string` | `"Port of the database"` | no |
+| ssm\_parameters\_port\_key\_name | Name of the database port SSM parameter key. | `string` | `"databasePort"` | no |
+| ssm\_parameters\_prefix | Prefix to be add on all SSM parameter keys. Cannot started by «/». | `string` | `""` | no |
+| ssm\_parameters\_tags | Tags to be merge with all SSM parameters resources. | `map(string)` | `{}` | no |
+| ssm\_parameters\_use\_database\_kms\_key | Use the same KMS key as for the database | `bool` | `false` | no |
+| ssm\_parameters\_use\_default\_kms\_key | Use default AWS KMS key | `bool` | `false` | no |
 | tags | Tags to be merged with all resources of this module. | `map(string)` | `{}` | no |
 | use\_default\_kms\_key | Use the default KMS key to encrypt DBs. | `bool` | `true` | no |
 | use\_num\_suffix | Always append numerical suffix to all resources. | `bool` | `true` | no |
@@ -203,5 +238,25 @@ Terraform module that helps you create a RDS instance.
 | security\_group\_name | n/a |
 | security\_group\_owner\_id | n/a |
 | security\_group\_vpc\_id | n/a |
+| ssm\_parameters\_arns | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_arn | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_description | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_id | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_name | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_path | n/a |
+| ssm\_parameters\_iam\_policy\_read\_only\_policy | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_arn | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_description | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_id | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_name | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_path | n/a |
+| ssm\_parameters\_iam\_policy\_read\_write\_policy | n/a |
+| ssm\_parameters\_kms\_alias\_arn | n/a |
+| ssm\_parameters\_kms\_alias\_target\_key\_arn | n/a |
+| ssm\_parameters\_kms\_key\_arn | n/a |
+| ssm\_parameters\_kms\_key\_id | n/a |
+| ssm\_parameters\_names | n/a |
+| ssm\_parameters\_types | n/a |
+| ssm\_parameters\_versions | n/a |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

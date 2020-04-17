@@ -76,4 +76,13 @@ module "kms_key" {
   security_group_name         = "tftest"
   security_group_source_cidrs = ["127.0.0.1/32", "10.0.0.0/8"]
   security_group_vpc_id       = data.aws_vpc.default.id
+
+  #####
+  # SSM parameters
+  #####
+
+  create_ssm_parameters              = true
+  ssm_parameters_use_default_kms_key = true
+  ssm_parameters_prefix              = random_string.this.result
+
 }

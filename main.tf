@@ -5,6 +5,7 @@ locals {
   }
   description = format("For %s %s", local.is_aurora ? "RDS cluster" : "DB instance", var.database_identifier)
   is_aurora   = replace(var.engine != null ? var.engine : "", "/^aurora{1}.*$/", "1") == "1" ? true : false
+  kms_key_id  = var.kms_key_create ? element(concat(aws_kms_key.this.*.arn, [""]), 0) : var.use_default_kms_key ? null : var.kms_key_id
 }
 
 resource "random_id" "final_snapshot" {
@@ -128,7 +129,7 @@ resource "aws_rds_cluster" "this" {
 
 
   storage_encrypted = true
-  kms_key_id        = var.kms_key_create ? element(concat(aws_kms_key.this.*.arn, [""]), 0) : var.use_default_kms_key ? var.kms_key_id : null
+  kms_key_id        = local.kms_key_id
 
   iam_roles                           = var.rds_cluster_iam_roles
   iam_database_authentication_enabled = var.iam_database_authentication_enabled
@@ -269,7 +270,7 @@ resource "aws_db_instance" "this" {
   identifier                            = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.database_identifier, (count.index + 1)) : format("%s%s-%02d", var.prefix, var.database_identifier, count.index + 1)
   instance_class                        = var.db_instance_instance_class
   iops                                  = var.db_instance_iops
-  kms_key_id                            = var.kms_key_create ? element(concat(aws_kms_key.this.*.arn, [""]), 0) : var.use_default_kms_key ? var.kms_key_id : null
+  kms_key_id                            = local.kms_key_id
   license_model                         = var.db_instance_license_model
   maintenance_window                    = var.preferred_maintenance_window
   max_allocated_storage                 = var.db_instance_max_allocated_storage
@@ -360,17 +361,17 @@ resource "aws_db_option_group" "this" {
   major_engine_version     = var.option_group_major_engine_version
 
   dynamic "option" {
-    for_each = var.option_group_option_names
+    for_each = var.option_group_options
 
     content {
-      option_name                    = element(concat(var.option_group_option_names, [null]), option.key)
-      port                           = element(concat(var.option_group_option_ports, [null]), option.key)
-      version                        = element(concat(var.option_group_option_versions, [null]), option.key)
-      db_security_group_memberships  = element(concat(var.option_group_option_db_security_group_memberships, [null]), option.key)
-      vpc_security_group_memberships = element(concat(var.option_group_option_vpc_security_group_memberships, [null]), option.key)
+      option_name                    = option.value.option_name
+      port                           = lookup(option.value, "port", null)
+      version                        = lookup(option.value, "version", null)
+      db_security_group_memberships  = lookup(option.value, "db_security_group_memberships", null)
+      vpc_security_group_memberships = lookup(option.value, "vpc_security_group_memberships", null)
 
       dynamic "option_settings" {
-        for_each = var.option_group_option_settings[option.key]
+        for_each = option.value.option_settings
 
         content {
           name  = option_settings.value.name
@@ -389,6 +390,7 @@ resource "aws_db_option_group" "this" {
     local.tags,
   )
 }
+
 
 #####
 # Security group
@@ -434,4 +436,84 @@ resource "aws_security_group_rule" "this_in_sg" {
   protocol                 = "tcp"
   source_security_group_id = var.security_group_source_security_group[count.index]
   security_group_id        = element(concat(aws_security_group.this.*.id, [""]), 0)
+}
+
+#####
+# SSM
+#####
+
+locals {
+  ssm_parameters_kms_key_id = var.ssm_parameters_kms_key_create ? null : var.ssm_parameters_use_database_kms_key ? local.kms_key_id : var.ssm_parameters_use_default_kms_key ? null : var.ssm_parameters_kms_key_id
+  ssm_parameters_names = concat(
+    var.ssm_parameters_export_endpoint ? [var.ssm_parameters_endpoint_key_name] : [],
+    var.ssm_parameters_export_port ? [var.ssm_parameters_port_key_name] : [],
+    var.ssm_parameters_export_master_username ? [var.ssm_parameters_master_username_key_name] : [],
+    var.ssm_parameters_export_master_password ? [var.ssm_parameters_master_pasword_key_name] : [],
+    var.ssm_parameters_export_database_name ? [var.ssm_parameters_database_name_key_name] : [],
+    var.ssm_parameters_export_character_set_name ? [var.ssm_parameters_character_set_name_key_name] : [],
+    var.ssm_parameters_export_endpoint_reader ? [var.ssm_parameters_endpoint_reader_key_name] : [],
+  )
+}
+
+module "ssm" {
+  source = "git::https://scm.dazzlingwrench.fxinnovation.com/fxinnovation-public/terraform-module-aws-ssm-parameters.git?ref=2.0.0"
+
+  enabled = var.enable && var.create_ssm_parameters
+
+  prefix = var.ssm_parameters_prefix
+
+  parameters_count = length(local.ssm_parameters_names)
+  names            = local.ssm_parameters_names
+  types = concat(
+    var.ssm_parameters_export_endpoint ? ["String"] : [],
+    var.ssm_parameters_export_port ? ["String"] : [],
+    var.ssm_parameters_export_master_username ? ["SecureString"] : [],
+    var.ssm_parameters_export_master_password ? ["SecureString"] : [],
+    var.ssm_parameters_export_database_name ? ["String"] : [],
+    var.ssm_parameters_export_character_set_name ? ["String"] : [],
+    var.ssm_parameters_export_endpoint_reader ? ["String"] : [],
+  )
+  values = concat(
+    var.ssm_parameters_export_endpoint ? [element(concat(aws_rds_cluster.this.*.endpoint, aws_db_instance.this.*.address, ["N/A"]), 0)] : [],
+    var.ssm_parameters_export_port ? [element(concat(aws_rds_cluster.this.*.port, aws_db_instance.this.*.port, ["N/A"]), 0)] : [],
+    var.ssm_parameters_export_master_username ? [element(concat(aws_rds_cluster.this.*.master_username, aws_db_instance.this.*.username, ["N/A"]), 0)] : [],
+    var.ssm_parameters_export_master_password ? [var.master_password] : [],
+    var.ssm_parameters_export_database_name ? [var.database_name != null ? var.database_name : "N/A"] : [],
+    var.ssm_parameters_export_character_set_name ? [var.db_instance_character_set_name != null ? var.db_instance_character_set_name : "N/A"] : [],
+    var.ssm_parameters_export_endpoint_reader ? [element(concat(aws_rds_cluster.this.*.reader_endpoint, ["N/A"]), 0)] : [],
+  )
+  descriptions = concat(
+    var.ssm_parameters_export_endpoint ? [var.ssm_parameters_endpoint_description] : [],
+    var.ssm_parameters_export_port ? [var.ssm_parameters_port_description] : [],
+    var.ssm_parameters_export_master_username ? [var.ssm_parameters_master_username_description] : [],
+    var.ssm_parameters_export_master_password ? [var.ssm_parameters_master_pasword_description] : [],
+    var.ssm_parameters_export_database_name ? [var.ssm_parameters_database_name_description] : [],
+    var.ssm_parameters_export_character_set_name ? [var.ssm_parameters_character_set_name_description] : [],
+    var.ssm_parameters_export_endpoint_reader ? [var.ssm_parameters_endpoint_reader_description] : [],
+  )
+
+  overwrite = true
+
+  use_default_kms_key = var.ssm_parameters_use_default_kms_key
+  kms_key_arn         = local.ssm_parameters_kms_key_id
+  kms_key_create      = var.ssm_parameters_kms_key_create
+  kms_key_name        = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.ssm_parameters_kms_key_name, 1) : format("%s%s", var.prefix, var.ssm_parameters_kms_key_name)
+  kms_key_alias_name  = var.use_num_suffix ? format("%s%s-%0${var.num_suffix_digits}d", var.prefix, var.ssm_parameters_kms_key_alias_name, 1) : format("%s%s", var.prefix, var.ssm_parameters_kms_key_alias_name)
+
+  iam_policy_create                 = var.ssm_parameters_iam_policy_create
+  iam_policy_path                   = var.ssm_parameters_iam_policy_path
+  iam_policy_name_prefix_read_only  = format("%s%s", var.prefix, var.ssm_parameters_iam_policy_name_prefix_read_only)
+  iam_policy_name_prefix_read_write = format("%s%s", var.prefix, var.ssm_parameters_iam_policy_name_prefix_read_write)
+
+  kms_tags = merge(
+    var.tags,
+    var.ssm_parameters_kms_key_tags,
+    local.tags,
+  )
+
+  tags = merge(
+    var.tags,
+    var.ssm_parameters_tags,
+    local.tags,
+  )
 }

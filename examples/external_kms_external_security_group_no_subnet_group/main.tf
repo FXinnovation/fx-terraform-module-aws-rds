@@ -104,5 +104,13 @@ module "external_kms_external_security_group_no_subnet_group" {
   #####
 
   use_default_kms_key = false
-  kms_key_id          = aws_kms_key.example.key_id
+  kms_key_id          = aws_kms_key.example.arn
+
+  #####
+  # SSM parameters
+  #####
+
+  create_ssm_parameters               = true
+  ssm_parameters_use_database_kms_key = true
+  ssm_parameters_prefix               = random_string.this.result
 }
