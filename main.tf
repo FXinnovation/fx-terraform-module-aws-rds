@@ -5,7 +5,7 @@ locals {
   }
   description = format("For %s %s", local.is_aurora ? "RDS cluster" : "DB instance", var.database_identifier)
   is_aurora   = replace(var.engine != null ? var.engine : "", "/^aurora{1}.*$/", "1") == "1" ? true : false
-  kms_key_id  = var.kms_key_create ? element(concat(aws_kms_key.this.*.arn, [""]), 0) : var.use_default_kms_key ? null : var.kms_key_id
+  kms_key_id  = var.kms_key_create ? element(concat(aws_kms_key.this.*.arn, [""]), 0) : var.use_default_kms_key ? "" : var.kms_key_id
 }
 
 resource "random_id" "final_snapshot" {
@@ -443,7 +443,7 @@ resource "aws_security_group_rule" "this_in_sg" {
 #####
 
 locals {
-  ssm_parameters_kms_key_id = var.ssm_parameters_kms_key_create ? null : var.ssm_parameters_use_database_kms_key ? local.kms_key_id : var.ssm_parameters_use_default_kms_key ? null : var.ssm_parameters_kms_key_id
+  ssm_parameters_kms_key_id = var.ssm_parameters_kms_key_create ? "f" : var.ssm_parameters_use_database_kms_key ? local.kms_key_id : var.ssm_parameters_use_default_kms_key ? "f" : var.ssm_parameters_kms_key_id
   ssm_parameters_names = concat(
     var.ssm_parameters_export_endpoint ? [var.ssm_parameters_endpoint_key_name] : [],
     var.ssm_parameters_export_port ? [var.ssm_parameters_port_key_name] : [],
