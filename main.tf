@@ -443,7 +443,7 @@ resource "aws_security_group_rule" "this_in_sg" {
 #####
 
 locals {
-  ssm_parameters_kms_key_id = var.ssm_parameters_kms_key_create ? "" : var.ssm_parameters_use_database_kms_key ? local.kms_key_id : var.ssm_parameters_use_default_kms_key ? "" : var.ssm_parameters_kms_key_id
+  ssm_parameters_kms_key_id = var.ssm_parameters_kms_key_create ? null : var.ssm_parameters_use_database_kms_key ? local.kms_key_id : var.ssm_parameters_use_default_kms_key ? null : var.ssm_parameters_kms_key_id
   ssm_parameters_names = concat(
     var.ssm_parameters_export_endpoint ? [var.ssm_parameters_endpoint_key_name] : [],
     var.ssm_parameters_export_port ? [var.ssm_parameters_port_key_name] : [],
