@@ -140,7 +140,7 @@ variable "preferred_maintenance_window" {
 }
 
 variable "prefix" {
-  description = "Prefix to be added to all resources, execpt SSM paramter keys. To prefix SSM parameter keys, see `ssm_parameters_prefix`."
+  description = "Prefix to be added to all resources, except SSM paramter keys. To prefix SSM parameter keys, see `ssm_parameters_prefix`."
   type        = string
   default     = ""
 }

@@ -3,9 +3,9 @@
 Terraform module that helps you create a RDS instance.
 
 This module can create :
-  * 1 RDS cluster with n RDS cluster endpoint OR 1 RDS db instance (dynamicly choosen depending the engine)
+  * 1 RDS cluster with n RDS cluster endpoint OR 1 RDS db instance (dynamiclly choosen depending the engine)
   * 1 option group (if not RDS cluster)
-  * 1 parameter group / cluster parameter group (dynamicly choosen depending the engine)
+  * 1 parameter group / cluster parameter group (dynamiclly choosen depending the engine)
   * 1 subnet group
   * 1 KMS key
   * 1 security group that allow security groups and/or cidr range to access to the database
@@ -108,7 +108,7 @@ This module can create :
 | port | The database port | `number` | `null` | no |
 | preferred\_backup\_window | The daily time range during which automated backups are created if automated backups are enabled. Time in UTC, e.g. 04:00-09:00 | `string` | `null` | no |
 | preferred\_maintenance\_window | The weekly window to perform maintenance in. Time in UTC  e.g. wed:04:00-wed:04:30 | `string` | `null` | no |
-| prefix | Prefix to be added to all resources, execpt SSM paramter keys. To prefix SSM parameter keys, see `ssm_parameters_prefix`. | `string` | `""` | no |
+| prefix | Prefix to be added to all resources, except SSM paramter keys. To prefix SSM parameter keys, see `ssm_parameters_prefix`. | `string` | `""` | no |
 | publicly\_accessible | Bool to control if instance is publicly accessible. | `bool` | `false` | no |
 | rds\_cluster\_enable\_http\_endpoint | Enable HTTP endpoint (data API). Only valid when engine\_mode is set to serverless. | `bool` | `false` | no |
 | rds\_cluster\_enable\_s3\_import | Enable S3 import on RDS database creation | `bool` | `false` | no |

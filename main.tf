@@ -5,7 +5,7 @@ locals {
   }
   description = format("For %s %s", local.is_aurora ? "RDS cluster" : "DB instance", var.database_identifier)
   is_aurora   = replace(var.engine != null ? var.engine : "", "/^aurora{1}.*$/", "1") == "1" ? true : false
-  kms_key_id  = var.kms_key_create ? element(concat(aws_kms_key.this.*.arn, [""]), 0) : var.use_default_kms_key ? "" : var.kms_key_id
+  kms_key_id  = var.kms_key_create ? element(concat(aws_kms_key.this.*.arn, [""]), 0) : var.use_default_kms_key ? null : var.kms_key_id
 }
 
 resource "random_id" "final_snapshot" {
@@ -420,8 +420,8 @@ resource "aws_security_group_rule" "this_in_cidr" {
   count = var.enable && length(var.security_group_source_cidrs) > 0 ? 1 : 0
 
   type              = "ingress"
-  from_port         = element(concat(aws_rds_cluster.this.*.port, [0]), 0)
-  to_port           = element(concat(aws_rds_cluster.this.*.port, [0]), 0)
+  from_port         = element(concat(aws_rds_cluster.this.*.port, aws_db_instance.this.*.port, [0]), 0)
+  to_port           = element(concat(aws_rds_cluster.this.*.port, aws_db_instance.this.*.port, [0]), 0)
   protocol          = "tcp"
   cidr_blocks       = var.security_group_source_cidrs
   security_group_id = element(concat(aws_security_group.this.*.id, [""]), 0)
@@ -431,8 +431,8 @@ resource "aws_security_group_rule" "this_in_sg" {
   count = var.enable && length(var.security_group_source_security_group) > 0 ? length(var.security_group_source_security_group) : 0
 
   type                     = "ingress"
-  from_port                = element(concat(aws_rds_cluster.this.*.port, [0]), 0)
-  to_port                  = element(concat(aws_rds_cluster.this.*.port, [0]), 0)
+  from_port                = element(concat(aws_rds_cluster.this.*.port, aws_db_instance.this.*.port, [0]), 0)
+  to_port                  = element(concat(aws_rds_cluster.this.*.port, aws_db_instance.this.*.port, [0]), 0)
   protocol                 = "tcp"
   source_security_group_id = var.security_group_source_security_group[count.index]
   security_group_id        = element(concat(aws_security_group.this.*.id, [""]), 0)
@@ -443,7 +443,7 @@ resource "aws_security_group_rule" "this_in_sg" {
 #####
 
 locals {
-  ssm_parameters_kms_key_id = var.ssm_parameters_kms_key_create ? "f" : var.ssm_parameters_use_database_kms_key ? local.kms_key_id : var.ssm_parameters_use_default_kms_key ? "f" : var.ssm_parameters_kms_key_id
+  ssm_parameters_kms_key_id = var.ssm_parameters_kms_key_create ? null : var.ssm_parameters_use_database_kms_key ? local.kms_key_id : var.ssm_parameters_use_default_kms_key ? null : var.ssm_parameters_kms_key_id
   ssm_parameters_names = concat(
     var.ssm_parameters_export_endpoint ? [var.ssm_parameters_endpoint_key_name] : [],
     var.ssm_parameters_export_port ? [var.ssm_parameters_port_key_name] : [],
@@ -456,7 +456,7 @@ locals {
 }
 
 module "ssm" {
-  source = "git::https://scm.dazzlingwrench.fxinnovation.com/fxinnovation-public/terraform-module-aws-ssm-parameters.git?ref=hotfix/kms_iam_policy"
+  source = "git::https://scm.dazzlingwrench.fxinnovation.com/fxinnovation-public/terraform-module-aws-ssm-parameters.git?ref=2.0.1"
 
   enabled = var.enable && var.create_ssm_parameters
 
