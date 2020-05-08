@@ -1,0 +1,13 @@
+name: aws-rds-db-instance
+title: AWS Relational Database Service - db-instance example
+maintainer: FXinnovation, Inc.
+copyright: FXinnovaion, Inc.
+copyright_email: cloudsquad@fxinnovation.com
+license: MIT
+summary: Inspec for the db-instance example of the AWS RDS Terraform module
+version: 0.1.0
+supports:
+  - platform: aws
+depends:
+  - name: aws-rds
+    path: ../../
