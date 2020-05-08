@@ -1,0 +1,39 @@
+name: aws-rds
+title: AWS Relational Database Service
+maintainer: FXinnovation, Inc.
+copyright: FXinnovaion, Inc.
+copyright_email: cloudsquad@fxinnovation.com
+license: MIT
+summary: Inspec for the AWS RDS Terraform module
+version: 0.1.0
+supports:
+  - platform: aws
+inputs:
+  - name: enabled
+    description: whether the module is enabled or not
+    required: true
+    profile: aws-rds
+  - name: is_aurora
+    description: Whether the RDS in an Aurora Cluster
+    required: true
+    profile: aws-rds
+  - name: db_cluster_identifier
+    description: Identifier of the db cluster.
+    required: false
+    profile: aws-rds
+  - name: db_instance_identifier
+    description: Identifier of the db instance.
+    required: false
+    profile: aws-rds
+  - name: db_name
+    description: Name of the database.
+    required: false
+    profile: aws-rds
+  - name: engine
+    description: Name of the database engine.
+    required: false
+    profile: aws-rds
+  - name: engine_version
+    description: Version of the database engine to match against.
+    required: false
+    profile: aws-rds
