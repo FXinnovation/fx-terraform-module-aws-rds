@@ -163,8 +163,8 @@ This module can create :
 | ssm\_parameters\_kms\_key\_id | ID of the kms key if toggle ssm\_parameters\_kms\_key\_create, ssm\_parameters\_use\_database\_kms\_key or ssm\_parameters\_use\_default\_kms\_key are disable. | `bool` | `false` | no |
 | ssm\_parameters\_kms\_key\_name | Name of the KMS key. | `string` | `""` | no |
 | ssm\_parameters\_kms\_key\_tags | Tags to be merge with all SSM parameters KMS key resources. | `map(string)` | `{}` | no |
-| ssm\_parameters\_master\_pasword\_description | Description of the master passsword SSM parameter. | `string` | `"Master password of the database"` | no |
-| ssm\_parameters\_master\_pasword\_key\_name | Name of the master passsword SSM parameter key. | `string` | `"masterPassword"` | no |
+| ssm\_parameters\_master\_password\_description | Description of the master passsword SSM parameter. | `string` | `"Master password of the database"` | no |
+| ssm\_parameters\_master\_password\_key\_name | Name of the master passsword SSM parameter key. | `string` | `"masterPassword"` | no |
 | ssm\_parameters\_master\_username\_description | Description of the master username SSM parameter. | `string` | `"Master username of the database"` | no |
 | ssm\_parameters\_master\_username\_key\_name | Name of the master username SSM parameter key. | `string` | `"masterUsername"` | no |
 | ssm\_parameters\_port\_description | Description of the database port SSM parameter. | `string` | `"Port of the database"` | no |

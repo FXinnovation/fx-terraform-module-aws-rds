@@ -751,13 +751,13 @@ variable "ssm_parameters_export_master_password" {
   default     = true
 }
 
-variable "ssm_parameters_master_pasword_key_name" {
+variable "ssm_parameters_master_password_key_name" {
   description = "Name of the master passsword SSM parameter key."
   type        = string
   default     = "masterPassword"
 }
 
-variable "ssm_parameters_master_pasword_description" {
+variable "ssm_parameters_master_password_description" {
   description = "Description of the master passsword SSM parameter."
   type        = string
   default     = "Master password of the database"
