@@ -18,13 +18,13 @@ $ terraform apply
 |------|---------|
 | terraform | >= 0.12 |
 | aws | ~> 2 |
-| aws | ~>2.57 |
+| aws | ~> 2.57 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | ~> 2 ~>2.57 |
+| aws | ~> 2 ~> 2.57 |
 | random | n/a |
 
 ## Inputs

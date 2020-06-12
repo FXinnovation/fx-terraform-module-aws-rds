@@ -456,7 +456,7 @@ locals {
 }
 
 module "ssm" {
-  source = "git::https://scm.dazzlingwrench.fxinnovation.com/fxinnovation-public/terraform-module-aws-ssm-parameters.git?ref=2.0.1"
+  source = "git::https://scm.dazzlingwrench.fxinnovation.com/fxinnovation-public/terraform-module-aws-ssm-parameters.git?ref=feat/prepare_terraform_013"
 
   enabled = var.enable && var.create_ssm_parameters
 
@@ -492,7 +492,7 @@ module "ssm" {
     var.ssm_parameters_export_endpoint_reader ? [var.ssm_parameters_endpoint_reader_description] : [],
   )
 
-  overwrite = true
+  overwrites = [true]
 
   use_default_kms_key = var.ssm_parameters_use_default_kms_key
   kms_key_arn         = local.ssm_parameters_kms_key_id

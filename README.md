@@ -27,13 +27,13 @@ This module can create :
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12 |
-| aws | ~>2.57 |
+| aws | ~> 2.57 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | ~>2.57 |
+| aws | ~> 2.57 |
 | random | n/a |
 
 ## Inputs
