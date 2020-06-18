@@ -456,7 +456,7 @@ locals {
 }
 
 module "ssm" {
-  source = "git::https://scm.dazzlingwrench.fxinnovation.com/fxinnovation-public/terraform-module-aws-ssm-parameters.git?ref=feat/prepare_terraform_013"
+  source = "git::https://scm.dazzlingwrench.fxinnovation.com/fxinnovation-public/terraform-module-aws-ssm-parameters.git?ref=3.0.1"
 
   enabled = var.enable && var.create_ssm_parameters
 
