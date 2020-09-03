@@ -12,6 +12,15 @@ resource "random_string" "this" {
   number  = false
 }
 
+resource "aws_security_group" "example" {
+  name        = format("%s%s", random_string.this.result, "tftest-option-group")
+  description = format("%s%s", random_string.this.result, "tftest-option-group")
+  vpc_id      = data.aws_vpc.default.id
+  tags = {
+    tftest = true
+  }
+}
+
 module "kms_key" {
   source = "../../"
 
@@ -73,9 +82,13 @@ module "kms_key" {
   # Security group
   #####
 
-  security_group_name         = "tftest"
-  security_group_source_cidrs = ["127.0.0.1/32", "10.0.0.0/8"]
-  security_group_vpc_id       = data.aws_vpc.default.id
+  security_group_name                = "tftest"
+  allowed_cidrs                      = ["127.0.0.1/32", "10.0.0.0/8"]
+  security_group_vpc_id              = data.aws_vpc.default.id
+  allowed_security_group_ids         = [aws_security_group.example.id]
+  allowed_security_group_ids_count   = 1
+  manage_client_security_group_rules = false
+
 
   #####
   # SSM parameters

@@ -3,7 +3,7 @@
 #####
 
 variable "enable" {
-  description = "Enable this module."
+  description = "Whether or not to enable this module."
   type        = bool
   default     = true
 }
@@ -633,16 +633,28 @@ variable "security_group_name" {
   default     = ""
 }
 
-variable "security_group_source_cidrs" {
-  description = "List for CIDR to add as inbound address in the security group."
+variable "allowed_cidrs" {
+  description = "List of CIDR's that will be allowed to talk to the database. These should be CIDR's of the \"clients\" accessing the RDS."
   type        = list(string)
   default     = []
 }
 
-variable "security_group_source_security_group" {
-  description = "List of security group id to be add as source security group"
+variable "allowed_security_group_ids" {
+  description = "List of security group ID's that will be allowed to talk to the database. These should be the security groups of the \"clients\" accessing the RDS."
   type        = list(string)
   default     = []
+}
+
+variable "allowed_security_group_ids_count" {
+  description = "Number of security group ID's that are set in the `allowed_security_group_ids` variable."
+  type        = number
+  default     = 0
+}
+
+variable "manage_client_security_group_rules" {
+  description = "Whether or not to manage the security group rules for the client security group ids (`allowed_security_group_ids`)."
+  type        = bool
+  default     = true
 }
 
 variable "security_group_vpc_id" {

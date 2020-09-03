@@ -73,8 +73,10 @@ module "db_instance_with_option_group" {
   # Security group
   #####
 
-  security_group_name         = "tftest"
-  security_group_source_cidrs = ["127.0.0.1/32", "10.0.0.0/8"]
+  security_group_name              = "tftest"
+  allowed_cidrs                    = ["127.0.0.1/32", "10.0.0.0/8"]
+  allowed_security_group_ids       = [aws_security_group.example.id]
+  allowed_security_group_ids_count = 1
   security_group_tags = {
     dbsgtags = "tftest"
   }

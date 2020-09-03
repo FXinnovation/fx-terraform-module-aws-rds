@@ -397,7 +397,7 @@ resource "aws_db_option_group" "this" {
 #####
 
 locals {
-  security_group_needed = length(var.security_group_source_cidrs) > 0 || length(var.security_group_source_security_group) > 0
+  security_group_needed = length(var.allowed_cidrs) > 0 || length(var.allowed_security_group_ids) > 0
 }
 
 resource "aws_security_group" "this" {
@@ -417,25 +417,36 @@ resource "aws_security_group" "this" {
 }
 
 resource "aws_security_group_rule" "this_in_cidr" {
-  count = var.enable && length(var.security_group_source_cidrs) > 0 ? 1 : 0
+  count = var.enable && length(var.allowed_cidrs) > 0 ? 1 : 0
 
   type              = "ingress"
   from_port         = element(concat(aws_rds_cluster.this.*.port, aws_db_instance.this.*.port, [0]), 0)
   to_port           = element(concat(aws_rds_cluster.this.*.port, aws_db_instance.this.*.port, [0]), 0)
   protocol          = "tcp"
-  cidr_blocks       = var.security_group_source_cidrs
+  cidr_blocks       = var.allowed_cidrs
   security_group_id = element(concat(aws_security_group.this.*.id, [""]), 0)
 }
 
 resource "aws_security_group_rule" "this_in_sg" {
-  count = var.enable && length(var.security_group_source_security_group) > 0 ? length(var.security_group_source_security_group) : 0
+  count = var.enable && var.allowed_security_group_ids_count > 0 ? var.allowed_security_group_ids_count : 0
 
   type                     = "ingress"
   from_port                = element(concat(aws_rds_cluster.this.*.port, aws_db_instance.this.*.port, [0]), 0)
   to_port                  = element(concat(aws_rds_cluster.this.*.port, aws_db_instance.this.*.port, [0]), 0)
   protocol                 = "tcp"
-  source_security_group_id = var.security_group_source_security_group[count.index]
+  source_security_group_id = var.allowed_security_group_ids[count.index]
   security_group_id        = element(concat(aws_security_group.this.*.id, [""]), 0)
+}
+
+resource "aws_security_group_rule" "client_egress_sg" {
+  count = var.enable && var.manage_client_security_group_rules && var.allowed_security_group_ids_count > 0 ? var.allowed_security_group_ids_count : 0
+
+  type                     = "egress"
+  from_port                = element(concat(aws_rds_cluster.this.*.port, aws_db_instance.this.*.port, [0]), 0)
+  to_port                  = element(concat(aws_rds_cluster.this.*.port, aws_db_instance.this.*.port, [0]), 0)
+  protocol                 = "tcp"
+  security_group_id        = var.allowed_security_group_ids[count.index]
+  source_security_group_id = element(concat(aws_security_group.this.*.id, [""]), 0)
 }
 
 #####

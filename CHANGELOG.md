@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.0.0
+
+  * feat: (BREAKING) Create SG rule for client and rename variable
+
 ## 2.1.0
 
   * maintenance: bump SSM parameters module to 3.0.1

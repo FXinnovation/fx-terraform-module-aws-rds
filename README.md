@@ -41,6 +41,9 @@ This module can create :
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | additionnal\_security\_group | Additionnal security group to add to db. | `list(string)` | `[]` | no |
+| allowed\_cidrs | List of CIDR's that will be allowed to talk to the database. These should be CIDR's of the "clients" accessing the RDS. | `list(string)` | `[]` | no |
+| allowed\_security\_group\_ids | List of security group ID's that will be allowed to talk to the database. These should be the security groups of the "clients" accessing the RDS. | `list(string)` | `[]` | no |
+| allowed\_security\_group\_ids\_count | Number of security group ID's that are set in the `allowed_security_group_ids` variable. | `number` | `0` | no |
 | apply\_immediately | Specifies whether any database modifications are applied immediately, or during the next maintenance window | `bool` | `false` | no |
 | auto\_minor\_version\_upgrade | Indicates that minor engine upgrades will be applied automatically to the DB instance during the maintenance window. | `bool` | `true` | no |
 | backtrack\_window | The target backtrack window, in seconds. Only available for aurora engine currently. To disable backtracking, set this value to 0 | `number` | `0` | no |
@@ -75,7 +78,7 @@ This module can create :
 | db\_subnet\_group\_tags | Map of tags to be nerge with db subnet group | `map(string)` | `{}` | no |
 | deletion\_protection | If the DB instance should have deletion protection enabled. | `bool` | `false` | no |
 | description | Description to be added on security\_group, rds\_parameter\_group, kms\_key and db\_subnet\_group. | `string` | `null` | no |
-| enable | Enable this module. | `bool` | `true` | no |
+| enable | Whether or not to enable this module. | `bool` | `true` | no |
 | enable\_s3\_import | Enable S3 import | `bool` | `false` | no |
 | engine | The name of the database engine to be used for this DB | `string` | `null` | no |
 | engine\_mode | The database engine mode. | `string` | `null` | no |
@@ -89,6 +92,7 @@ This module can create :
 | kms\_key\_name | Name of the KMS if kms\_key\_create is set to true. | `string` | `null` | no |
 | kms\_key\_policy\_json | Policy of the KMS Key | `string` | `null` | no |
 | kms\_key\_tags | Tags to be merged with all KMS key resources | `map(string)` | `{}` | no |
+| manage\_client\_security\_group\_rules | Whether or not to manage the security group rules for the client security group ids (`allowed_security_group_ids`). | `bool` | `true` | no |
 | master\_password | Password for the master DB user. | `string` | `null` | no |
 | master\_username | Username for the master DB user. | `string` | `null` | no |
 | monitoring\_interval | The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. | `number` | `null` | no |
@@ -133,8 +137,6 @@ This module can create :
 | s3\_import\_source\_engine | Source engine for the backup | `string` | `null` | no |
 | s3\_import\_source\_engine\_version | Version of source engine for the backup | `string` | `null` | no |
 | security\_group\_name | Name of the security group | `string` | `""` | no |
-| security\_group\_source\_cidrs | List for CIDR to add as inbound address in the security group. | `list(string)` | `[]` | no |
-| security\_group\_source\_security\_group | List of security group id to be add as source security group | `list(string)` | `[]` | no |
 | security\_group\_tags | Tags to be merged to the security group | `map(string)` | `{}` | no |
 | security\_group\_vpc\_id | ID of the VPC | `string` | `null` | no |
 | skip\_final\_snapshot | Determines whether a final DB snapshot is created before the DB cluster is deleted. | `bool` | `true` | no |
