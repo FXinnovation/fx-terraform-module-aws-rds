@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## x.x.x (unreleased)
+
+  * chore: bump pre-commit hooks
+
 ## 3.0.0
 
   * feat: (BREAKING) Create SG rule for client and rename variable
