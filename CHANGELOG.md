@@ -1,8 +1,9 @@
 # CHANGELOG
 
-## x.x.x (unreleased)
+## 3.0.1
 
   * chore: bump pre-commit hooks
+  * fix: in versions.tf change from `~> 2.57` to `>= 2.57, < 4.0`
 
 ## 3.0.0
 
