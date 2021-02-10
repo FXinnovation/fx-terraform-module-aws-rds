@@ -245,7 +245,7 @@ resource "aws_rds_cluster_parameter_group" "this" {
 #####
 
 resource "aws_db_instance" "this" {
-  count = var.enable && ! local.is_aurora ? 1 : 0
+  count = var.enable && !local.is_aurora ? 1 : 0
 
   allocated_storage                     = var.db_instance_allocated_storage
   allow_major_version_upgrade           = var.db_instance_allow_major_version_upgrade
@@ -318,7 +318,7 @@ resource "aws_db_instance" "this" {
 }
 
 locals {
-  db_parameter_group_needed = ! local.is_aurora && length(var.parameter_group_parameters) > 0
+  db_parameter_group_needed = !local.is_aurora && length(var.parameter_group_parameters) > 0
 }
 
 resource "aws_db_parameter_group" "this" {
@@ -349,7 +349,7 @@ resource "aws_db_parameter_group" "this" {
 }
 
 locals {
-  db_option_group_needed = ! local.is_aurora && length(var.option_group_options) > 0
+  db_option_group_needed = !local.is_aurora && length(var.option_group_options) > 0
 }
 
 resource "aws_db_option_group" "this" {
