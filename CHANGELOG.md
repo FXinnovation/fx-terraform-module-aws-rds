@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## 3.0.2
-  * feat: update pre-commit 
+  * feat: update pre-commit
   * fix: main.tf change ssm version from 3.0.1 to 3.0.2
 
 ## 3.0.1
