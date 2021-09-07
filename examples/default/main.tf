@@ -1,10 +1,3 @@
-provider "aws" {
-  version    = "~> 2"
-  region     = "ca-central-1"
-  access_key = var.access_key
-  secret_key = var.secret_key
-}
-
 resource "random_string" "this" {
   length  = 8
   upper   = false
