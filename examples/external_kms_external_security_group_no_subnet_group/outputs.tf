@@ -226,6 +226,7 @@ output "security_group_egress" {
   value = module.external_kms_external_security_group_no_subnet_group.security_group_egress
 }
 
+
 #####
 # SSM parameters
 #####
