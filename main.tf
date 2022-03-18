@@ -467,7 +467,7 @@ locals {
 }
 
 module "ssm" {
-  source = "git::ssh://git@scm.dazzlingwrench.fxinnovation.com:2222/fxinnovation-public/terraform-module-aws-ssm-parameters.git?ref=5.0.0"
+  source = "git::ssh://git@github.com/FXinnovation/fx-terraform-module-aws-ssm-parameters.git?ref=5.0.0"
 
   enabled = var.enable && var.create_ssm_parameters
 
