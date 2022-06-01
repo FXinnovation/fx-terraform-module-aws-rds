@@ -1,5 +1,4 @@
 provider "aws" {
-  version    = "~> 2"
   region     = "ca-central-1"
   access_key = var.access_key
   secret_key = var.secret_key
@@ -21,7 +20,7 @@ module "rds_cluster" {
   #####
 
   engine                     = "aurora-mysql"
-  engine_version             = "5.7.mysql_aurora.2.07.1"
+  engine_version             = "5.7.mysql_aurora.3.02.0"
   deletion_protection        = false
   apply_immediately          = true
   auto_minor_version_upgrade = true

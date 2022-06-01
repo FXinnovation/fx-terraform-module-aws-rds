@@ -1,5 +1,4 @@
 provider "aws" {
-  version    = "~> 2"
   region     = "ca-central-1"
   access_key = var.access_key
   secret_key = var.secret_key
@@ -21,7 +20,7 @@ module "db_instance" {
   #####
 
   engine                     = "postgres"
-  engine_version             = "9.6.9"
+  engine_version             = "14.2"
   deletion_protection        = false
   apply_immediately          = true
   auto_minor_version_upgrade = false
