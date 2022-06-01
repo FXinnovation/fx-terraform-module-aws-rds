@@ -1,5 +1,4 @@
 provider "aws" {
-  version    = "~> 2"
   region     = "ca-central-1"
   access_key = var.access_key
   secret_key = var.secret_key
@@ -29,7 +28,7 @@ module "db_instance_with_option_group" {
   #####
 
   engine                     = "mysql"
-  engine_version             = "5.7.19"
+  engine_version             = "8.0.29"
   deletion_protection        = false
   apply_immediately          = true
   auto_minor_version_upgrade = true

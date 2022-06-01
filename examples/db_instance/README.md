@@ -17,14 +17,13 @@ $ terraform apply
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.12 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 2 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 2.57 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 2 ~> 2.57 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 2.57 |
 | <a name="provider_random"></a> [random](#provider\_random) | n/a |
 
 ## Modules

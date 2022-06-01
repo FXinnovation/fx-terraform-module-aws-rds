@@ -1,5 +1,4 @@
 provider "aws" {
-  version    = "~> 2"
   region     = "ca-central-1"
   access_key = var.access_key
   secret_key = var.secret_key
@@ -45,7 +44,7 @@ module "external_kms_external_security_group_no_subnet_group" {
   #####
 
   engine                     = "aurora-mysql"
-  engine_version             = "5.7.mysql_aurora.2.07.1"
+  engine_version             = "5.7.mysql_aurora.3.02.0"
   deletion_protection        = false
   additionnal_security_group = [aws_security_group.example.id]
   apply_immediately          = true
