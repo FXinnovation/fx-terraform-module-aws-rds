@@ -15,7 +15,7 @@ output "engine_version" {
 }
 
 output "database_name" {
-  value = element(concat(aws_rds_cluster.this.*.database_name, aws_db_instance.this.*.name, [""]), 0)
+  value = element(concat(aws_rds_cluster.this.*.database_name, aws_db_instance.this.*.db_name, [""]), 0)
 }
 
 output "port" {
