@@ -277,7 +277,7 @@ resource "aws_db_instance" "this" {
   monitoring_interval                   = var.monitoring_interval
   monitoring_role_arn                   = var.monitoring_role_arn
   multi_az                              = var.db_instance_multi_az
-  name                                  = var.database_name
+  db_name                               = var.database_name
   option_group_name                     = local.db_option_group_needed ? element(concat(aws_db_option_group.this.*.id, [""]), 0) : var.option_group_name
   parameter_group_name                  = local.db_parameter_group_needed ? element(concat(aws_db_parameter_group.this.*.id, [""]), 0) : var.parameter_group_name
   password                              = var.master_password
@@ -467,7 +467,7 @@ locals {
 }
 
 module "ssm" {
-  source = "git::https://github.com/FXinnovation/fx-terraform-module-aws-ssm-parameters.git?ref=3.0.4"
+  source = "git::https://github.com/FXinnovation/fx-terraform-module-aws-ssm-parameters.git?ref=6.0.0"
 
   enabled = var.enable && var.create_ssm_parameters
 
