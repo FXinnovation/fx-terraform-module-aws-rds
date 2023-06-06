@@ -40,7 +40,7 @@ This module can create :
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_ssm"></a> [ssm](#module\_ssm) | git::https://github.com/FXinnovation/fx-terraform-module-aws-ssm-parameters.git | 3.0.4 |
+| <a name="module_ssm"></a> [ssm](#module\_ssm) | git::https://github.com/FXinnovation/fx-terraform-module-aws-ssm-parameters.git | 6.0.0 |
 
 ## Resources
 
