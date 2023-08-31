@@ -1,14 +1,17 @@
 provider "aws" {
-  region     = "ca-central-1"
-  access_key = var.access_key
-  secret_key = var.secret_key
+  region = "ca-central-1"
+
+  assume_role {
+    role_arn     = "arn:aws:iam::700633540182:role/Jenkins"
+    session_name = "FXTestSandbox"
+  }
 }
 
 resource "random_string" "this" {
   length  = 8
   upper   = false
   special = false
-  number  = false
+  numeric = false
 
 }
 
@@ -20,7 +23,7 @@ module "db_instance" {
   #####
 
   engine                     = "postgres"
-  engine_version             = "14.2"
+  engine_version             = "14.9"
   deletion_protection        = false
   apply_immediately          = true
   auto_minor_version_upgrade = false
@@ -52,7 +55,7 @@ module "db_instance" {
   db_subnet_group_tags = {
     dbsubnetgrouptag = "tftest"
   }
-  db_subnet_group_subnet_ids = tolist(data.aws_subnet_ids.default.ids)
+  db_subnet_group_subnet_ids = tolist(data.aws_subnets.default.ids)
 
   #####
   # KMS key

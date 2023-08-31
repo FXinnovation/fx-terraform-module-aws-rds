@@ -26,15 +26,16 @@ This module can create :
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.12 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 2.57 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 2.57 |
-| <a name="provider_random"></a> [random](#provider\_random) | n/a |
+| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.1 |
 
 ## Modules
 
@@ -93,7 +94,6 @@ This module can create :
 | <a name="input_db_instance_max_allocated_storage"></a> [db\_instance\_max\_allocated\_storage](#input\_db\_instance\_max\_allocated\_storage) | When configured, the upper limit to which Amazon RDS can automatically scale the storage of the DB instance. | `number` | `null` | no |
 | <a name="input_db_instance_multi_az"></a> [db\_instance\_multi\_az](#input\_db\_instance\_multi\_az) | Specifies if the RDS instance is multi-AZ | `bool` | `false` | no |
 | <a name="input_db_instance_performance_insights_retention_period"></a> [db\_instance\_performance\_insights\_retention\_period](#input\_db\_instance\_performance\_insights\_retention\_period) | The amount of time in days to retain Performance Insights data | `number` | `null` | no |
-| <a name="input_db_instance_promotion_tiers"></a> [db\_instance\_promotion\_tiers](#input\_db\_instance\_promotion\_tiers) | List of number for failover Priority setting on instance level. This will be use for the master election, and, load balancing into the cluster. | `list(number)` | `null` | no |
 | <a name="input_db_instance_replicate_source_db"></a> [db\_instance\_replicate\_source\_db](#input\_db\_instance\_replicate\_source\_db) | Specifies that this resource is a Replicate database, and to use this value as the source database. | `string` | `null` | no |
 | <a name="input_db_instance_storage_type"></a> [db\_instance\_storage\_type](#input\_db\_instance\_storage\_type) | One of "standard" (magnetic), "gp2" (general purpose SSD), or "io1" (provisioned IOPS SSD). | `string` | `null` | no |
 | <a name="input_db_instance_tags"></a> [db\_instance\_tags](#input\_db\_instance\_tags) | List of Tags to be merge to each db instances | `list(map(string))` | `[]` | no |
@@ -102,7 +102,6 @@ This module can create :
 | <a name="input_db_subnet_group_subnet_ids"></a> [db\_subnet\_group\_subnet\_ids](#input\_db\_subnet\_group\_subnet\_ids) | A list of VPC subnet IDs. | `list(string)` | `[]` | no |
 | <a name="input_db_subnet_group_tags"></a> [db\_subnet\_group\_tags](#input\_db\_subnet\_group\_tags) | Map of tags to be nerge with db subnet group | `map(string)` | `{}` | no |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | If the DB instance should have deletion protection enabled. | `bool` | `false` | no |
-| <a name="input_description"></a> [description](#input\_description) | Description to be added on security\_group, rds\_parameter\_group, kms\_key and db\_subnet\_group. | `string` | `null` | no |
 | <a name="input_enable"></a> [enable](#input\_enable) | Whether or not to enable this module. | `bool` | `true` | no |
 | <a name="input_enable_s3_import"></a> [enable\_s3\_import](#input\_enable\_s3\_import) | Enable S3 import | `bool` | `false` | no |
 | <a name="input_engine"></a> [engine](#input\_engine) | The name of the database engine to be used for this DB | `string` | `null` | no |
@@ -140,7 +139,6 @@ This module can create :
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix to be added to all resources, except SSM paramter keys. To prefix SSM parameter keys, see `ssm_parameters_prefix`. | `string` | `""` | no |
 | <a name="input_publicly_accessible"></a> [publicly\_accessible](#input\_publicly\_accessible) | Bool to control if instance is publicly accessible. | `bool` | `false` | no |
 | <a name="input_rds_cluster_enable_http_endpoint"></a> [rds\_cluster\_enable\_http\_endpoint](#input\_rds\_cluster\_enable\_http\_endpoint) | Enable HTTP endpoint (data API). Only valid when engine\_mode is set to serverless. | `bool` | `false` | no |
-| <a name="input_rds_cluster_enable_s3_import"></a> [rds\_cluster\_enable\_s3\_import](#input\_rds\_cluster\_enable\_s3\_import) | Enable S3 import on RDS database creation | `bool` | `false` | no |
 | <a name="input_rds_cluster_enable_scaling_configuration"></a> [rds\_cluster\_enable\_scaling\_configuration](#input\_rds\_cluster\_enable\_scaling\_configuration) | Enable scalling configuration. Only valid when engine\_mode is set to serverless. | `bool` | `false` | no |
 | <a name="input_rds_cluster_global_cluster_identifier"></a> [rds\_cluster\_global\_cluster\_identifier](#input\_rds\_cluster\_global\_cluster\_identifier) | The global cluster identifier. | `string` | `null` | no |
 | <a name="input_rds_cluster_iam_roles"></a> [rds\_cluster\_iam\_roles](#input\_rds\_cluster\_iam\_roles) | A List of ARNs for the IAM roles to associate to the RDS Cluster. | `list(string)` | `[]` | no |

@@ -1,0 +1,38 @@
+name: Terraform to build examples for module
+
+#reference: https://developer.hashicorp.com/terraform/tutorials/automation/github-actions
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  test:
+    uses: FXinnovation/samples-github-workflows/.github/workflows/terraform-test.yaml@master
+  list-examples:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: set-matrix
+        run: echo "matrix=$(find examples -type d -maxdepth 1 -mindepth 1 | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+  build-examples:
+    needs: ["test", "list-examples"]
+    name: build ${{ matrix.env }}
+    uses: FXinnovation/samples-github-workflows/.github/workflows/terraform-examples.yaml@master
+    if: ${{ toJson(fromJson(needs.list-examples.outputs.matrix)) != '[]' && needs.list-examples.outputs.matrix != '' }}
+    permissions:
+      id-token: write
+      contents: read
+    secrets: inherit
+    with:
+      env: ${{ matrix.env }}
+      role_to_assume: "arn:aws:iam::325173229774:role/github-fxinnovation"
+      run_kind: true
+    strategy:
+      fail-fast: false
+      matrix:
+        env: ${{ fromJson(needs.list-examples.outputs.matrix) }}

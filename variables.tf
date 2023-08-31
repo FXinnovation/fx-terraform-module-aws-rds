@@ -112,6 +112,7 @@ variable "iam_database_authentication_enabled" {
 
 variable "use_num_suffix" {
   description = "Always append numerical suffix to all resources."
+  type        = bool
   default     = true
 }
 
@@ -143,12 +144,6 @@ variable "prefix" {
   description = "Prefix to be added to all resources, except SSM paramter keys. To prefix SSM parameter keys, see `ssm_parameters_prefix`."
   type        = string
   default     = ""
-}
-
-variable "description" {
-  description = "Description to be added on security_group, rds_parameter_group, kms_key and db_subnet_group."
-  type        = string
-  default     = null
 }
 
 variable "tags" {
@@ -196,12 +191,6 @@ variable "s3_import_source_engine" {
 variable "s3_import_source_engine_version" {
   description = "Version of source engine for the backup "
   type        = string
-  default     = null
-}
-
-variable "db_instance_promotion_tiers" {
-  description = "List of number for failover Priority setting on instance level. This will be use for the master election, and, load balancing into the cluster."
-  type        = list(number)
   default     = null
 }
 
@@ -387,11 +376,6 @@ variable "rds_cluster_identifier" {
 }
 
 
-variable "rds_cluster_enable_s3_import" {
-  description = "Enable S3 import on RDS database creation"
-  type        = bool
-  default     = false
-}
 
 variable "rds_cluster_enable_scaling_configuration" {
   description = "Enable scalling configuration. Only valid when engine_mode is set to serverless."
